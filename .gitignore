@@ -1,0 +1,13 @@
+# Dependências e artefatos de build
+frontend/node_modules/
+frontend/dist/
+backend/target/
+
+# Configurações locais de IDE
+.idea/
+*.iml
+
+# Variáveis de ambiente e segredos locais
+.env
+.env.*
+!.env.example
