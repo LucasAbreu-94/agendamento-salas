@@ -1,6 +1,6 @@
 package br.com.foursys.agendamento_salas.security;
 
-import br.com.foursys.agendamento_salas.model.Usuario;
+import br.com.foursys.agendamento_salas.domain.Usuario;
 import br.com.foursys.agendamento_salas.repository.UsuarioRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

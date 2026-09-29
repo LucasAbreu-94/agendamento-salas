@@ -1,7 +1,7 @@
 package br.com.foursys.agendamento_salas.controller;
 
 import br.com.foursys.agendamento_salas.dto.CriarUsuarioRequest;
-import br.com.foursys.agendamento_salas.model.Usuario;
+import br.com.foursys.agendamento_salas.domain.Usuario;
 import br.com.foursys.agendamento_salas.service.UsuarioService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

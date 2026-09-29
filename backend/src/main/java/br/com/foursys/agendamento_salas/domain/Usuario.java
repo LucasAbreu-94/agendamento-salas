@@ -1,4 +1,4 @@
-package br.com.foursys.agendamento_salas.model;
+package br.com.foursys.agendamento_salas.domain;
 
 import jakarta.persistence.*;
 import lombok.Getter;
