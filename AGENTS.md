@@ -16,9 +16,13 @@ Durante o desenvolvimento, Angular roda em `http://localhost:4200` e Spring Boot
 
 Leia os documentos relevantes em `docs/` antes de implementar uma tarefa.
 
+## Variáveis de ambiente
+
+O backend lê banco e autenticação de um arquivo `backend/.env`, que não é versionado. Consulte `backend/.env.example` para a lista de variáveis. Nunca versione valores reais.
+
 ## Regras gerais
 
-- Não adicionar banco de dados, Spring Security, Microsoft Graph ou APIs de IA sem pedido explícito.
+- Banco de dados MySQL e Spring Security estão autorizados para usuários e autenticação; Microsoft Graph e APIs de IA continuam proibidos sem pedido explícito.
 - Não alterar tecnologias, versões ou adicionar dependências sem necessidade clara.
 - Não expor ou versionar senhas, tokens, chaves ou outras credenciais.
 - Manter alterações pequenas, focadas e compatíveis com o comportamento existente.
