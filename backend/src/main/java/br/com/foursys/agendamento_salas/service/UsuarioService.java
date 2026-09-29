@@ -1,7 +1,7 @@
 package br.com.foursys.agendamento_salas.service;
 
 import br.com.foursys.agendamento_salas.dto.CriarUsuarioRequest;
-import br.com.foursys.agendamento_salas.model.Usuario;
+import br.com.foursys.agendamento_salas.domain.Usuario;
 import br.com.foursys.agendamento_salas.repository.UsuarioRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
