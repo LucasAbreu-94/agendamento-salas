@@ -1,4 +1,4 @@
-package br.com.foursys.agendamento_salas.sala;
+package br.com.foursys.agendamento_salas.controller;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -9,6 +9,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import br.com.foursys.agendamento_salas.domain.Sala;
+import br.com.foursys.agendamento_salas.service.SalaBuscaService;
 
 @RestController
 @RequestMapping("/api/salas")

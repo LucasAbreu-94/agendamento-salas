@@ -1,10 +1,13 @@
-package br.com.foursys.agendamento_salas.sala;
+package br.com.foursys.agendamento_salas.service;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+
+import br.com.foursys.agendamento_salas.domain.Sala;
+import br.com.foursys.agendamento_salas.exception.ValidacaoBuscaException;
 
 @Service
 public class SalaBuscaService {

@@ -1,4 +1,4 @@
-package br.com.foursys.agendamento_salas.sala;
+package br.com.foursys.agendamento_salas.exception;
 
 public class ValidacaoBuscaException extends RuntimeException {
 

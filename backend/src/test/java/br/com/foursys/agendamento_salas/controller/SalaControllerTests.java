@@ -1,4 +1,4 @@
-package br.com.foursys.agendamento_salas.sala;
+package br.com.foursys.agendamento_salas.controller;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;

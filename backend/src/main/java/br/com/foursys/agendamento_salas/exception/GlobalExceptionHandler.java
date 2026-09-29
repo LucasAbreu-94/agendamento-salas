@@ -1,10 +1,10 @@
-package br.com.foursys.agendamento_salas.api;
+package br.com.foursys.agendamento_salas.exception;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import br.com.foursys.agendamento_salas.sala.ValidacaoBuscaException;
+import br.com.foursys.agendamento_salas.dto.ErroResposta;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
