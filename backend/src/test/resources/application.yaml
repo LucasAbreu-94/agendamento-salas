@@ -1,0 +1,23 @@
+spring:
+  application:
+    name: agendamento-salas
+
+  datasource:
+    url: jdbc:h2:mem:testdb;MODE=MySQL;DB_CLOSE_DELAY=-1
+    username: sa
+    password: ""
+    driver-class-name: org.h2.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+
+app:
+  jwt:
+    secret: Zm91cnNjaGVkdWxlci10b2tlbi1kZS10ZXN0ZS1uYW8tdXNhci1lbS1wcm9kdWNhbw==
+    expiration-seconds: 3600
