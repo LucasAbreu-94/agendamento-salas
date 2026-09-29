@@ -14,4 +14,4 @@ A busca recebe data, horário inicial, horário final (ou duração) e quantidad
 
 ## Estado do MVP
 
-Os dados são mockados. Nenhuma reserva é registrada no Outlook e não há chamadas ao Microsoft Graph ou a serviços externos de IA.
+Salas e reservas são mockadas. Usuários e autenticação ficam no MySQL local. Nenhuma reserva é registrada no Outlook e não há chamadas ao Microsoft Graph ou a serviços externos de IA.
