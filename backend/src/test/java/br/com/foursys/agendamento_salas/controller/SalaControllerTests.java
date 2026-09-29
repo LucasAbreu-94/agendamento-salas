@@ -107,4 +107,22 @@ class SalaControllerTests {
 				.andExpect(status().isBadRequest())
 				.andExpect(jsonPath("$.mensagem").value("A quantidade de pessoas deve ser ao menos 1."));
 	}
+
+	@Test
+	void deveRetornar404ParaRotaDesconhecida() throws Exception {
+		mockMvc.perform(get("/api/salas/nao-existe")
+						.param("data", LocalDate.now().plusDays(1).toString()))
+				.andExpect(status().isNotFound())
+				.andExpect(jsonPath("$.status").value(404));
+	}
+
+	@Test
+	void deveRetornar400QuandoFaltarParametroObrigatorio() throws Exception {
+		mockMvc.perform(get("/api/salas/disponiveis")
+						.param("data", LocalDate.now().plusDays(1).toString())
+						.param("inicio", "14:00")
+						.param("fim", "15:00"))
+				.andExpect(status().isBadRequest())
+				.andExpect(jsonPath("$.status").value(400));
+	}
 }
