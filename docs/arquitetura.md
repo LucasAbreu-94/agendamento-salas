@@ -28,7 +28,7 @@ No futuro, apenas o backend poderá integrar IA e Microsoft Graph. O frontend co
 | `repository` | acesso a dados (Spring Data JPA) |
 | `dto` | payloads de entrada e saída das APIs |
 | `exception` | exceções de negócio e `GlobalExceptionHandler` |
-| `integration` | contratos de integração (calendário e IA), nas tasks futuras |
+| `integration` | contratos de integração (calendário e IA), em issues futuras |
 | `config`, `security` | configuração e segurança |
 
 Erros seguem o modelo padrão de `docs/contratos-api.md`.
