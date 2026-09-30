@@ -25,6 +25,10 @@ public class CustomUserDetails implements UserDetails {
         return usuario.getPassword();
     }
 
+    public Long getId() {
+        return usuario.getId();
+    }
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(
