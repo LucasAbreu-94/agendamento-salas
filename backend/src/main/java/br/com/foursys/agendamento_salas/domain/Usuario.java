@@ -1,4 +1,4 @@
-package br.com.foursys.agendamento_salas.model;
+package br.com.foursys.agendamento_salas.domain;
 
 import br.com.foursys.agendamento_salas.enums.PerfilUsuario;
 import jakarta.persistence.*;

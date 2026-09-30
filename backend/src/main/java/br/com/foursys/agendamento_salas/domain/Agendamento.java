@@ -1,4 +1,4 @@
-package br.com.foursys.agendamento_salas.model;
+package br.com.foursys.agendamento_salas.domain;
 
 import br.com.foursys.agendamento_salas.enums.StatusAgendamento;
 import jakarta.persistence.*;
@@ -25,7 +25,7 @@ public class Agendamento {
 
     @ManyToOne
     @JoinColumn(name = "sala_id")
-    private Sala salaId;
+    private SalaEntity salaId;
 
     private LocalDateTime dataAgendamento;
     private LocalTime horaInicio;
