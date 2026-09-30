@@ -29,6 +29,8 @@ public class UsuarioService {
                 passwordEncoder.encode(request.password())
         );
 
+        usuario.setPerfilUsuario(request.perfilUsuario());
+
         return usuarioRepository.save(usuario);
 
     }
