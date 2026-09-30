@@ -53,6 +53,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/auth/login").permitAll()
                         .requestMatchers("/usuarios").permitAll()
+                        .requestMatchers("/api/salas/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(
