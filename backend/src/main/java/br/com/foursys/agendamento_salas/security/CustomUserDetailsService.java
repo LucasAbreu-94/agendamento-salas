@@ -1,6 +1,7 @@
 package br.com.foursys.agendamento_salas.security;
 
 import br.com.foursys.agendamento_salas.domain.Usuario;
+import br.com.foursys.agendamento_salas.port.out.UsuarioRepositoryPort;
 import br.com.foursys.agendamento_salas.repository.UsuarioRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -9,17 +10,17 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
-    private final UsuarioRepository usuarioRepository;
+    private final UsuarioRepositoryPort usuarioRepositoryPort;
 
-    public CustomUserDetailsService(UsuarioRepository usuarioRepository) {
-        this.usuarioRepository = usuarioRepository;
+    public CustomUserDetailsService(UsuarioRepositoryPort usuarioRepositoryPort) {
+        this.usuarioRepositoryPort = usuarioRepositoryPort;
     }
 
     @Override
-    public UserDetails loadUserByUsername(String username)
+    public UserDetails loadUserByUsername(String email)
             throws UsernameNotFoundException {
 
-        Usuario usuario = usuarioRepository.findByUsername(username)
+        Usuario usuario = usuarioRepositoryPort.buscarUsuarioEmail(email)
                 .orElseThrow(() ->
                         new UsernameNotFoundException(
                                 "Usuário não encontrado"

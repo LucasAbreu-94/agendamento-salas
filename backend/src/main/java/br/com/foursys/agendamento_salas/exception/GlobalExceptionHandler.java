@@ -7,7 +7,7 @@ import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import br.com.foursys.agendamento_salas.dto.ErroResposta;
+import br.com.foursys.agendamento_salas.dto.response.ErroResposta;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
