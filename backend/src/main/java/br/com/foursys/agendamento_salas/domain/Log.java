@@ -24,7 +24,7 @@ public class Log {
 
     @ManyToOne
     @JoinColumn(name = "sala_agendamento")
-    private SalaEntity salaAgendamento;
+    private Sala salaAgendamento;
 
     private LocalTime horaInicioAgendamento;
     private LocalTime horaFimAgendamento;

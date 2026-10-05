@@ -1,6 +1,6 @@
 # Contratos de API e de integração
 
-Este documento define os contratos da TASK 0: a API REST do MVP e as interfaces de integração (calendário e IA) que serão implementadas nas tasks futuras. As integrações externas ainda não existem; os contratos existem para que os mocks possam ser substituídos sem alterar o fluxo do frontend.
+Este documento define os contratos da issue #9: a API REST do MVP e as interfaces de integração (calendário e IA) que serão implementadas em issues futuras. As integrações externas ainda não existem; os contratos existem para que os mocks possam ser substituídos sem alterar o fluxo do frontend.
 
 ## Modelo de erro padrão
 
@@ -45,7 +45,7 @@ Resposta `200`:
 
 Salas com capacidade inferior a `pessoas` são filtradas; a resposta pode ser uma lista vazia.
 
-### POST /api/reservas — previsto (TASK 6)
+### POST /api/reservas - previsto (#15)
 
 Request:
 
@@ -78,7 +78,7 @@ Validações: sala existente e ativa, capacidade suficiente, data válida, horá
 
 Escopo e contrato: **A definir**.
 
-### Interpretação em linguagem natural — previsto (TASK 10)
+### Interpretação em linguagem natural - previsto (#19)
 
 Entrada do tipo `{"solicitacao": "Quero uma sala amanhã às 14h para 8 pessoas"}` convertida na estrutura `AgendamentoIntent`:
 
@@ -93,9 +93,9 @@ Entrada do tipo `{"solicitacao": "Quero uma sala amanhã às 14h para 8 pessoas"
 | `recursos` | pode ser nulo |
 | `objetivo` | pode ser nulo |
 
-Campos não informados permanecem nulos e nunca são inventados; solicitações incompletas geram pergunta de complementação. Contrato exato da requisição HTTP: **A definir** (TASK 10).
+Campos não informados permanecem nulos e nunca são inventados; solicitações incompletas geram pergunta de complementação. Contrato exato da requisição HTTP: **A definir** (#19).
 
-## Integração de calendário — `CalendarProvider` (TASK 8)
+## Integração de calendário - `CalendarProvider` (#17)
 
 Interface em `integration/` para desacoplar o domínio do provedor de calendário:
 
@@ -111,7 +111,7 @@ DTOs: `CalendarAvailabilityRequest`, `CalendarAvailabilityResponse`, `CalendarEv
 - Provedor concreto (tecnologia, autenticação, consistência entre banco e calendário): **A definir**.
 - **Microsoft Graph não pode ser usado no MVP** (ver `AGENTS.md`).
 
-## Integração de IA — `LlamaClient` (TASK 9)
+## Integração de IA - `LlamaClient` (#18)
 
 | Método | Propósito |
 |---|---|

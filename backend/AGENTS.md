@@ -26,5 +26,5 @@ Enquanto o MVP for mockado, dados podem ficar em `mock/` ou em providers/service
 - data passada e horários inválidos;
 - término anterior ao início;
 - capacidade e disponibilidade;
-- sala não encontrada ou indisponível;
+- salaTeste não encontrada ou indisponível;
 - confirmação de reserva.

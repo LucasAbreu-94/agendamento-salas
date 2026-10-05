@@ -1,6 +1,6 @@
 package br.com.foursys.agendamento_salas.controller;
 
-import br.com.foursys.agendamento_salas.dto.LoginRequest;
+import br.com.foursys.agendamento_salas.dto.request.LoginRequest;
 import br.com.foursys.agendamento_salas.security.JwtService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -34,7 +34,7 @@ public class AuthController {
         Authentication authentication =
                 authenticationManager.authenticate(
                         new UsernamePasswordAuthenticationToken(
-                                request.username(),
+                                request.email(),
                                 request.password()
                         )
                 );
