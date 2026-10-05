@@ -66,12 +66,13 @@ public class SalaService {
     }
 
     public List<SalaResponse> buscarSalasDisponiveis(LocalDate data, LocalTime inicio, LocalTime fim, Integer pessoas, String email) {
-        long duracao = calcularDuracao(inicio,fim);
-        Usuario usuario = usuarioRepositoryPort.buscarUsuarioEmail(email).orElseThrow(UsuarioInexistenteException::new);
+        validar(data, inicio, fim, pessoas);
 
-        PerfilUsuario perfilUsuario = usuario.getPerfilUsuario();
-
-        validar(data, inicio, fim, duracao, pessoas, perfilUsuario);
+        if (calcularDuracao(inicio, fim) > 120 && perfilDoUsuario(email) == PerfilUsuario.USER) {
+            throw new ValidacaoBuscaException(
+                    "A duração não pode ser maior que 2 horas."
+            );
+        }
 
         return salaRepositoryPort.buscarDisoniveis(data,inicio,fim,pessoas)
                 .stream()
@@ -84,29 +85,33 @@ public class SalaService {
         return nome.trim().replaceAll("\\s+", " ");
     }
 
-    private void validar(LocalDate data, LocalTime inicio, LocalTime fim, Long duracao, Integer pessoas, PerfilUsuario perfilUsuario) {
+    private void validar(LocalDate data, LocalTime inicio, LocalTime fim, Integer pessoas) {
         if (pessoas == null || pessoas < 1) {
             throw new ValidacaoBuscaException("A quantidade de pessoas deve ser ao menos 1.");
         }
-        if (data.isBefore(LocalDate.now())) {
+        if (data == null || data.isBefore(LocalDate.now())) {
             throw new ValidacaoBuscaException("A data não pode estar no passado.");
         }
-        if (fim == null && duracao == null) {
+        if (inicio == null) {
+            throw new ValidacaoBuscaException("Informe o horário inicial da reserva.");
+        }
+        if (fim == null) {
             throw new ValidacaoBuscaException("Informe o horário final ou a duração da reserva.");
         }
-        if (duracao != null && duracao < 1) {
-            throw new ValidacaoBuscaException("A duração deve ser de ao menos 1 minuto.");
-        }
-
-        if (duracao > 120 && perfilUsuario == PerfilUsuario.USER) {
-            throw new ValidacaoBuscaException(
-                    "A duração não pode ser maior que 2 horas."
-            );
-        }
-        LocalTime fimReserva = (fim != null) ? fim : inicio.plusMinutes(duracao);
-        if (!fimReserva.isAfter(inicio)) {
+        if (!fim.isAfter(inicio)) {
             throw new ValidacaoBuscaException("O horário final deve ser posterior ao horário inicial.");
         }
+    }
+
+    private PerfilUsuario perfilDoUsuario(String email) {
+        if (email == null) {
+            return PerfilUsuario.USER;
+        }
+
+        Usuario usuario = usuarioRepositoryPort.buscarUsuarioEmail(email)
+                .orElseThrow(UsuarioInexistenteException::new);
+
+        return usuario.getPerfilUsuario();
     }
 
     public long calcularDuracao(LocalTime inicio, LocalTime fim) {

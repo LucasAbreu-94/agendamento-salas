@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.time.LocalDateTime;
 
@@ -70,6 +71,17 @@ public class GlobalExceptionHandler {
 				.body(new ErrorResponse(
 						HttpStatus.CONFLICT.value(),
 						exception.getMessage(),
+						LocalDateTime.now()
+				));
+	}
+
+	@ExceptionHandler(MethodArgumentTypeMismatchException.class)
+	public ResponseEntity<ErrorResponse> handleParametroInexistente() {
+		return ResponseEntity
+				.status(HttpStatus.NOT_FOUND)
+				.body(new ErrorResponse(
+						HttpStatus.NOT_FOUND.value(),
+						"Recurso não encontrado.",
 						LocalDateTime.now()
 				));
 	}

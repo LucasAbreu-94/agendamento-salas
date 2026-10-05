@@ -7,6 +7,7 @@ import br.com.foursys.agendamento_salas.service.SalaService;
 import io.jsonwebtoken.Jwt;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -52,8 +53,16 @@ public class SalaController {
                         request.data(),
                         request.horaInicio(),
                         request.horaFim(), request.qntdPessoas(),
-                        authentication.getName()
+                        emailDoUsuario(authentication)
                   )
         );
+    }
+
+    private String emailDoUsuario(Authentication authentication) {
+        if (authentication == null || authentication instanceof AnonymousAuthenticationToken) {
+            return null;
+        }
+
+        return authentication.getName();
     }
 }
