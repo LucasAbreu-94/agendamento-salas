@@ -1,10 +1,9 @@
-package br.com.foursys.agendamento_salas.dto.request;
+package br.com.foursys.agendamento_salas.dto;
 
 import br.com.foursys.agendamento_salas.enums.PerfilUsuario;
 
 public record CriarUsuarioRequest(
-        String email,
-        String nome,
+        String username,
         String password,
         PerfilUsuario perfilUsuario
 ) {

@@ -1,14 +1,12 @@
-package br.com.foursys.agendamento_salas.dto.request;
+package br.com.foursys.agendamento_salas.dto;
 
-import br.com.foursys.agendamento_salas.domain.Sala;
+import br.com.foursys.agendamento_salas.domain.SalaEntity;
 import br.com.foursys.agendamento_salas.domain.Usuario;
 
-import java.time.LocalDate;
 import java.time.LocalTime;
 
 public record CriarAgendamentoRequest(
-        Sala salaId,
-        LocalDate data,
+        SalaEntity salaId,
         LocalTime horaInicio,
         LocalTime horaFim,
         Integer qntdPessoas,

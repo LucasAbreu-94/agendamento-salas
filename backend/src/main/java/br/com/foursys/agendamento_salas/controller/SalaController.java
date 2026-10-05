@@ -1,68 +1,35 @@
 package br.com.foursys.agendamento_salas.controller;
 
-import br.com.foursys.agendamento_salas.dto.request.CriarAgendamentoRequest;
-import br.com.foursys.agendamento_salas.dto.request.CriarSalaRequest;
-import br.com.foursys.agendamento_salas.dto.response.SalaResponse;
-import br.com.foursys.agendamento_salas.service.SalaService;
-import io.jsonwebtoken.Jwt;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AnonymousAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.*;
-
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
+
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import br.com.foursys.agendamento_salas.domain.Sala;
+import br.com.foursys.agendamento_salas.service.SalaBuscaService;
 
 @RestController
 @RequestMapping("/api/salas")
 public class SalaController {
 
-    private final SalaService salaService;
+	private final SalaBuscaService salaBuscaService;
 
-    public SalaController(SalaService salaService) {
-        this.salaService = salaService;
-    }
+	public SalaController(SalaBuscaService salaBuscaService) {
+		this.salaBuscaService = salaBuscaService;
+	}
 
-    @PostMapping
-    public ResponseEntity<SalaResponse> criar(
-            @RequestBody CriarSalaRequest request,
-            @AuthenticationPrincipal Jwt usuarioId
-    ) {
-        SalaResponse response = salaService.criar(request);
-
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(response);
-    }
-
-    @GetMapping("/{id}")
-    public ResponseEntity<SalaResponse> buscarPorId(
-            @PathVariable Long id
-    ) {
-        return ResponseEntity.ok(salaService.buscarPorId(id));
-    }
-
-    @GetMapping("disponiveis")
-    public ResponseEntity<List<SalaResponse>> buscarDisponiveis(
-            @RequestBody CriarAgendamentoRequest request,
-            Authentication authentication
-    ) {
-        return ResponseEntity.ok(
-                salaService.buscarSalasDisponiveis(
-                        request.data(),
-                        request.horaInicio(),
-                        request.horaFim(), request.qntdPessoas(),
-                        emailDoUsuario(authentication)
-                  )
-        );
-    }
-
-    private String emailDoUsuario(Authentication authentication) {
-        if (authentication == null || authentication instanceof AnonymousAuthenticationToken) {
-            return null;
-        }
-
-        return authentication.getName();
-    }
+	@GetMapping("/disponiveis")
+	public List<Sala> disponiveis(
+			@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate data,
+			@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime inicio,
+			@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime fim,
+			@RequestParam(required = false) Integer duracao,
+			@RequestParam Integer pessoas) {
+		return salaBuscaService.buscar(data, inicio, fim, duracao, pessoas);
+	}
 }
