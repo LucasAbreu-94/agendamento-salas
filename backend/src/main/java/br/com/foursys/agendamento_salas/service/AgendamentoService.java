@@ -1,11 +1,11 @@
 package br.com.foursys.agendamento_salas.service;
 
-import br.com.foursys.agendamento_salas.dto.request.CriarAgendamentoRequest;
+import br.com.foursys.agendamento_salas.dto.CriarAgendamentoRequest;
 import br.com.foursys.agendamento_salas.enums.PerfilUsuario;
 import br.com.foursys.agendamento_salas.enums.StatusAgendamento;
 import br.com.foursys.agendamento_salas.domain.Agendamento;
 import br.com.foursys.agendamento_salas.domain.Log;
-import br.com.foursys.agendamento_salas.domain.Sala;
+import br.com.foursys.agendamento_salas.domain.SalaEntity;
 import br.com.foursys.agendamento_salas.domain.Usuario;
 import br.com.foursys.agendamento_salas.repository.AgendamentoRepository;
 import br.com.foursys.agendamento_salas.repository.LogRepository;
@@ -15,6 +15,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 
 @Service
@@ -37,7 +38,7 @@ public class AgendamentoService {
         Usuario usuario = usuarioRepository.findById(idUsuario)
                 .orElseThrow(() -> new RuntimeException("Usuario não encontrado."));
 
-        Sala sala = salaRepository.findById(agendamentoRequest.salaId().getId())
+        SalaEntity sala = salaRepository.findById(agendamentoRequest.salaId().getId())
                 .orElseThrow(() -> new RuntimeException("Sala não encontrada."));
 
         Agendamento agendamento = Agendamento
