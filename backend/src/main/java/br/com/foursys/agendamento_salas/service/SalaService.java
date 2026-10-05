@@ -98,8 +98,10 @@ public class SalaService {
             throw new ValidacaoBuscaException("A duração deve ser de ao menos 1 minuto.");
         }
 
-        if (duracao >2 && perfilUsuario.equals("USER")){
-            throw new ValidacaoBuscaException("A duração não pode ser maior que 2 horas");
+        if (duracao > 120 && perfilUsuario == PerfilUsuario.USER) {
+            throw new ValidacaoBuscaException(
+                    "A duração não pode ser maior que 2 horas."
+            );
         }
         LocalTime fimReserva = (fim != null) ? fim : inicio.plusMinutes(duracao);
         if (!fimReserva.isAfter(inicio)) {
