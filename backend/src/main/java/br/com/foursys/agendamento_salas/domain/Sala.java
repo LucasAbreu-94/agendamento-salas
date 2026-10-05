@@ -1,4 +1,27 @@
 package br.com.foursys.agendamento_salas.domain;
 
-public record Sala(String id, String nome, String local, int capacidade) {
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+@Builder
+@Getter
+@Entity
+@Table(name = "salas")
+@NoArgsConstructor
+@AllArgsConstructor
+public class Sala {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    private String nome;
+    private Boolean disponivel;
+    private Integer capacidade;
+    private String localizacao;
 }
