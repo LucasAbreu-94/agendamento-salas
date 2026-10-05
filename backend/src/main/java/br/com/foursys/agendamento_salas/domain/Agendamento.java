@@ -25,7 +25,7 @@ public class Agendamento {
 
     @ManyToOne
     @JoinColumn(name = "sala_id")
-    private SalaEntity salaId;
+    private Sala salaId;
 
     private LocalDateTime dataAgendamento;
     private LocalTime horaInicio;
