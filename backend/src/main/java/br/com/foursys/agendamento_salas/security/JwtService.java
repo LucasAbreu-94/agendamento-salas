@@ -21,7 +21,7 @@ public class JwtService {
         this.secret = secret;
     }
 
-    @Value("${jwt.expiration-seconds}")
+    @Value("${app.jwt.expiration-seconds}")
     private long expirationSeconds;
 
     public String generateToken(UserDetails userDetails) {
