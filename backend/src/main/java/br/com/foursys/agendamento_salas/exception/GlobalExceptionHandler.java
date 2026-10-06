@@ -38,15 +38,14 @@ public class GlobalExceptionHandler {
 			UsuarioInexistenteException exception
 	){
 		ErrorResponse error = new ErrorResponse(
-				HttpStatus.NOT_FOUND.value(),
+				HttpStatus.BAD_REQUEST.value(),
 				exception.getMessage(),
 				LocalDateTime.now()
 		);
 
 		return ResponseEntity
-				.status(HttpStatus.NOT_FOUND)
+				.status(HttpStatus.BAD_REQUEST)
 				.body(error);
-
 	}
 
 	@ExceptionHandler(SalaInexistenteException.class)
@@ -86,4 +85,19 @@ public class GlobalExceptionHandler {
 				));
 	}
 
+	@ExceptionHandler(UsuarioSemPermissaoException.class)
+	public ResponseEntity<ErrorResponse> handleUsuarioSemPermissao(
+			UsuarioSemPermissaoException exception
+	){
+		ErrorResponse error = new ErrorResponse(
+				HttpStatus.NOT_FOUND.value(),
+				exception.getMessage(),
+				LocalDateTime.now()
+		);
+
+		return ResponseEntity
+				.status(HttpStatus.NOT_FOUND)
+				.body(error);
+
+	}
 }

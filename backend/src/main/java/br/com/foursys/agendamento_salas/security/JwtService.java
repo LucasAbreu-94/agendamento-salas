@@ -9,6 +9,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
+import java.time.Instant;
 import java.util.Date;
 import java.util.function.Function;
 
@@ -20,11 +21,16 @@ public class JwtService {
         this.secret = secret;
     }
 
+    @Value("${jwt.expiration-seconds}")
+    private long expirationSeconds;
+
     public String generateToken(UserDetails userDetails) {
+        Date expiration = Date.from(Instant.now().plusSeconds(expirationSeconds));
+
         return Jwts.builder()
                 .subject(userDetails.getUsername())
                 .issuedAt(new Date())
-                .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60))
+                .expiration(expiration)
                 .signWith(getSigningKey())
                 .compact();
     }

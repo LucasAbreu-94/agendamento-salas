@@ -1,7 +1,7 @@
 package br.com.foursys.agendamento_salas.controller;
 
 import br.com.foursys.agendamento_salas.dto.request.CriarAgendamentoRequest;
-import br.com.foursys.agendamento_salas.security.AuthenticatedUserProvider;
+import br.com.foursys.agendamento_salas.security.SecurityUtils;
 import br.com.foursys.agendamento_salas.service.AgendamentoService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +23,7 @@ public class AgendamentoController {
     @PostMapping
     public ResponseEntity<Void> create(
             @RequestBody CriarAgendamentoRequest agendamentoRequest,
-            AuthenticatedUserProvider usuario
+            SecurityUtils usuario
     ) {
         Long usuarioAutenticado = usuario.get().id();
 
