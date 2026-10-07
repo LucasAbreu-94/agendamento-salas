@@ -7,9 +7,7 @@ import br.com.foursys.agendamento_salas.domain.Agendamento;
 import br.com.foursys.agendamento_salas.domain.Log;
 import br.com.foursys.agendamento_salas.domain.Sala;
 import br.com.foursys.agendamento_salas.domain.Usuario;
-import br.com.foursys.agendamento_salas.exception.SalaInexistenteException;
-import br.com.foursys.agendamento_salas.exception.UsuarioInexistenteException;
-import br.com.foursys.agendamento_salas.exception.UsuarioSemPermissaoException;
+import br.com.foursys.agendamento_salas.exception.*;
 import br.com.foursys.agendamento_salas.repository.AgendamentoRepository;
 import br.com.foursys.agendamento_salas.repository.LogRepository;
 import br.com.foursys.agendamento_salas.repository.SalaRepository;
@@ -17,6 +15,7 @@ import br.com.foursys.agendamento_salas.repository.UsuarioRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 
@@ -43,11 +42,23 @@ public class AgendamentoService {
         Sala sala = salaRepository.findById(agendamentoRequest.salaId().getId())
                 .orElseThrow(SalaInexistenteException::new);
 
+        boolean conflito = logRepository.existeConflito(sala.getId(), agendamentoRequest.data(),
+                agendamentoRequest.horaInicio(), agendamentoRequest.horaFim());
+
+        if(conflito) {
+            throw new SalaIndisponivelException();
+        }
+
+        if(agendamentoRequest.horaInicio().isAfter(agendamentoRequest.horaFim())) {
+            throw new HorarioAgendamentoInvalidoException();
+        }
+
         Agendamento agendamento = Agendamento
                 .builder()
                 .usuarioId(usuario)
                 .salaId(sala)
-                .dataAgendamento(LocalDateTime.now())
+                .dataAgendamento(agendamentoRequest.data())
+                .dataCriacao(LocalDateTime.now())
                 .horaInicio(agendamentoRequest.horaInicio())
                 .horaFim(agendamentoRequest.horaFim())
                 .qntdPessoas(agendamentoRequest.qntdPessoas())
@@ -73,6 +84,7 @@ public class AgendamentoService {
                 .builder()
                 .usuario(usuario)
                 .dataAgendamento(agendamento.getDataAgendamento())
+                .dataCriacao(agendamento.getDataCriacao())
                 .salaAgendamento(agendamento.getSalaId())
                 .horaInicioAgendamento(agendamento.getHoraInicio())
                 .horaFimAgendamento(agendamento.getHoraFim())

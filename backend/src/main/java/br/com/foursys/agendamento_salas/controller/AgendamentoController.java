@@ -1,6 +1,7 @@
 package br.com.foursys.agendamento_salas.controller;
 
 import br.com.foursys.agendamento_salas.dto.request.CriarAgendamentoRequest;
+import br.com.foursys.agendamento_salas.security.AuthenticatedUser;
 import br.com.foursys.agendamento_salas.security.SecurityUtils;
 import br.com.foursys.agendamento_salas.service.AgendamentoService;
 import org.springframework.http.HttpStatus;
