@@ -25,11 +25,10 @@ public class AgendamentoController {
 
     @PostMapping
     public ResponseEntity<Void> create(
-            @RequestBody CriarAgendamentoRequest agendamentoRequest,
-            SecurityUtils usuario
+            @RequestBody CriarAgendamentoRequest agendamentoRequest
     ) {
 
-        Long usuarioAutenticado = usuario.get().id();
+        Long usuarioAutenticado = securityUtils.get().id();
 
         agendamentoService.create(agendamentoRequest, usuarioAutenticado);
 
