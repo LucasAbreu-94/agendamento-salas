@@ -54,6 +54,7 @@ public class SecurityConfig {
                         .requestMatchers("/auth/login").permitAll()
                         .requestMatchers("/api/usuarios").permitAll()
                         .requestMatchers("/api/salas/**").permitAll()
+                        .requestMatchers("/api/ollama/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(
