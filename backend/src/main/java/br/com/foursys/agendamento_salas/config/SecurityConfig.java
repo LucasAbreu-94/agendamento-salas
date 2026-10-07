@@ -52,8 +52,10 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/auth/login").permitAll()
-                        .requestMatchers("/api/usuarios").permitAll()
                         .requestMatchers("/api/salas/**").permitAll()
+                        .requestMatchers("/api/ollama/**").permitAll()
+                        .requestMatchers("/api/salas/admin/criar").hasAnyRole("ADMIN")
+                        .requestMatchers("/api/usuarios").hasAnyRole("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(
