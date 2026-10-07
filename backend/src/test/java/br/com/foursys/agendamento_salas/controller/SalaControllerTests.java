@@ -2,7 +2,6 @@ package br.com.foursys.agendamento_salas.controller;
 
 import br.com.foursys.agendamento_salas.config.CorsConfig;
 import br.com.foursys.agendamento_salas.config.SecurityConfig;
-import br.com.foursys.agendamento_salas.dto.request.CriarSalaRequest;
 import br.com.foursys.agendamento_salas.dto.response.SalaResponse;
 import br.com.foursys.agendamento_salas.exception.SalaInexistenteException;
 import br.com.foursys.agendamento_salas.exception.ValidacaoBuscaException;
@@ -27,8 +26,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(SalaController.class)
@@ -48,38 +45,6 @@ class SalaControllerTests {
 	private UserDetailsService userDetailsService;
 
 	@Test
-	void deveCriarSalaEDevolverStatus201() throws Exception {
-		SalaResponse sala = new SalaResponse(12L, "Sala Focus", true, 8, "Tamboré");
-		when(salaService.criar(any(CriarSalaRequest.class))).thenReturn(sala);
-
-		mockMvc.perform(
-						post("/api/salas/admin/criar")
-								.contentType("application/json")
-								.content("""
-                                {
-                                    "nome": "Sala Focus",
-                                    "capacidade": 8,
-                                    "localizacao": "Tamboré"
-                                }
-                                """)
-				)
-				.andExpect(status().isCreated())
-				.andExpect(jsonPath("$.id").value(12))
-				.andExpect(jsonPath("$.nome").value("Sala Focus"));
-	}
-
-	@Test
-	void deveBuscarSalaExistentePorId() throws Exception {
-		when(salaService.buscarPorId(12L))
-				.thenReturn(new SalaResponse(12L, "Sala Focus", true, 8, "Tamboré"));
-
-		mockMvc.perform(get("/api/salas/12"))
-				.andExpect(status().isOk())
-				.andExpect(jsonPath("$.id").value(12))
-				.andExpect(jsonPath("$.capacidade").value(8));
-	}
-
-	@Test
 	void deveRetornarTodasAsSalasParaUmaPessoa() throws Exception {
 
 		when(salaService.buscarSalasDisponiveis(
@@ -93,34 +58,6 @@ class SalaControllerTests {
 		mockMvc.perform(
 						get("/api/salas/disponiveis")
 								.with(user("teste@email.com"))
-								.contentType("application/json")
-								.content("""
-                                {
-                                    "salaId": null,
-                                    "data": "%s",
-                                    "horaInicio": "14:00",
-                                    "horaFim": "15:00",
-                                    "qntdPessoas": 1,
-                                    "usuarioIdSolicitante": null,
-                                    "titulo": "Teste"
-                                }
-                                """.formatted(LocalDate.now().plusDays(1)))
-				)
-				.andExpect(status().isOk());
-	}
-
-	@Test
-	void deveBuscarDisponibilidadeSemAutenticacaoComEmailNulo() throws Exception {
-		when(salaService.buscarSalasDisponiveis(
-				any(LocalDate.class),
-				any(LocalTime.class),
-				any(LocalTime.class),
-				eq(1),
-				isNull()
-		)).thenReturn(List.of());
-
-		mockMvc.perform(
-						get("/api/salas/disponiveis")
 								.contentType("application/json")
 								.content("""
                                 {

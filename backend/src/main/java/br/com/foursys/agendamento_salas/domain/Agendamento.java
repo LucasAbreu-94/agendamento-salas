@@ -6,7 +6,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
@@ -28,8 +27,7 @@ public class Agendamento {
     @JoinColumn(name = "sala_id")
     private Sala salaId;
 
-    private LocalDate dataAgendamento;
-    private LocalDateTime dataCriacao;
+    private LocalDateTime dataAgendamento;
     private LocalTime horaInicio;
     private LocalTime horaFim;
     private Integer qntdPessoas;
