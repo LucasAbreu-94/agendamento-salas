@@ -4,8 +4,6 @@ import br.com.foursys.agendamento_salas.domain.Sala;
 import br.com.foursys.agendamento_salas.dto.response.SalaResponse;
 import org.mapstruct.Mapper;
 
-import java.util.List;
-
 @Mapper(componentModel = "spring")
 public interface SalaMapper {
     SalaResponse entityToResponse(Sala entity);

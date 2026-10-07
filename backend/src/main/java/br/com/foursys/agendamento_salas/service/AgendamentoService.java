@@ -7,6 +7,9 @@ import br.com.foursys.agendamento_salas.domain.Agendamento;
 import br.com.foursys.agendamento_salas.domain.Log;
 import br.com.foursys.agendamento_salas.domain.Sala;
 import br.com.foursys.agendamento_salas.domain.Usuario;
+import br.com.foursys.agendamento_salas.exception.SalaInexistenteException;
+import br.com.foursys.agendamento_salas.exception.UsuarioInexistenteException;
+import br.com.foursys.agendamento_salas.exception.UsuarioSemPermissaoException;
 import br.com.foursys.agendamento_salas.repository.AgendamentoRepository;
 import br.com.foursys.agendamento_salas.repository.LogRepository;
 import br.com.foursys.agendamento_salas.repository.SalaRepository;
@@ -35,10 +38,10 @@ public class AgendamentoService {
     @Transactional
     public void create(CriarAgendamentoRequest agendamentoRequest, Long idUsuario) {
         Usuario usuario = usuarioRepository.findById(idUsuario)
-                .orElseThrow(() -> new RuntimeException("Usuario não encontrado."));
+                .orElseThrow(UsuarioInexistenteException::new);
 
         Sala sala = salaRepository.findById(agendamentoRequest.salaId().getId())
-                .orElseThrow(() -> new RuntimeException("Sala não encontrada."));
+                .orElseThrow(SalaInexistenteException::new);
 
         Agendamento agendamento = Agendamento
                 .builder()
@@ -55,8 +58,11 @@ public class AgendamentoService {
 
         if(agendamentoRequest.usuarioIdSolicitante() != null) {
             if(!usuario.getPerfilUsuario().equals(PerfilUsuario.ADMIN)) {
-                throw new RuntimeException("O usuário não tem permissão para agendar por outro solicitante.");
+                throw new UsuarioSemPermissaoException();
             } else {
+                usuarioRepository.findById(agendamentoRequest.usuarioIdSolicitante().getId())
+                        .orElseThrow(UsuarioInexistenteException::new);
+
                 agendamento.setUsuarioIdSolicitante(agendamentoRequest.usuarioIdSolicitante());
             }
         }

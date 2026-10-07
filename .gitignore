@@ -12,3 +12,9 @@ backend/target/
 .env
 .env.*
 !.env.example
+
+.github/copilot-instructions.md
+.github/skills/
+.github/instructions/foursys-*.instructions.md
+agentes_foursys/
+doc_projeto/

@@ -24,7 +24,7 @@ public class SalaController {
         this.salaService = salaService;
     }
 
-    @PostMapping
+    @PostMapping("admin/criar")
     public ResponseEntity<SalaResponse> criar(
             @RequestBody CriarSalaRequest request,
             @AuthenticationPrincipal Jwt usuarioId
