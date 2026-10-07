@@ -15,17 +15,19 @@ import org.springframework.web.bind.annotation.RestController;
 public class AgendamentoController {
 
     private final AgendamentoService agendamentoService;
+    private final SecurityUtils securityUtils;
 
-    public AgendamentoController(AgendamentoService agendamentoService) {
+    public AgendamentoController(AgendamentoService agendamentoService, SecurityUtils securityUtils) {
         this.agendamentoService = agendamentoService;
+        this.securityUtils = securityUtils;
     }
 
     @PostMapping
     public ResponseEntity<Void> create(
-            @RequestBody CriarAgendamentoRequest agendamentoRequest,
-            SecurityUtils usuario
+            @RequestBody CriarAgendamentoRequest agendamentoRequest
     ) {
-        Long usuarioAutenticado = usuario.get().id();
+
+        Long usuarioAutenticado = securityUtils.get().id();
 
         agendamentoService.create(agendamentoRequest, usuarioAutenticado);
 
