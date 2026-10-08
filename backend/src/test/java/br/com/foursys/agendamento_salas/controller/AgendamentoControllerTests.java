@@ -2,23 +2,28 @@ package br.com.foursys.agendamento_salas.controller;
 
 import br.com.foursys.agendamento_salas.domain.Sala;
 import br.com.foursys.agendamento_salas.dto.request.CriarAgendamentoRequest;
+import br.com.foursys.agendamento_salas.dto.response.AgendamentoResponse;
 import br.com.foursys.agendamento_salas.dto.response.ConfimacaoAgendamentoResponse;
 import br.com.foursys.agendamento_salas.enums.StatusAgendamento;
 import br.com.foursys.agendamento_salas.security.AuthenticatedUser;
 import br.com.foursys.agendamento_salas.security.SecurityUtils;
 import br.com.foursys.agendamento_salas.service.AgendamentoService;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+@DisplayName("AgendamentoController - Fluxo de agendamentos")
 class AgendamentoControllerTests {
 
     private AgendamentoService agendamentoService;
@@ -33,6 +38,7 @@ class AgendamentoControllerTests {
     }
 
     @Test
+    @DisplayName("Deve criar agendamento e retornar a confirmação com status 201")
     void deveCriarAgendamentoRetornandoStatus201EConfirmacaoDoNovoFluxo() {
         when(securityUtils.get()).thenReturn(new AuthenticatedUser(42L, "usuario@email.com"));
 
@@ -69,5 +75,54 @@ class AgendamentoControllerTests {
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
         assertEquals(expected, response.getBody());
         verify(agendamentoService).create(request, 42L);
+    }
+
+    @Test
+    @DisplayName("Deve retornar os agendamentos do usuário autenticado")
+    void deveRetornarAgendamentosDoUsuarioAutenticado() {
+        when(securityUtils.get()).thenReturn(new AuthenticatedUser(42L, "usuario@email.com"));
+        List<AgendamentoResponse> expected = List.of(agendamentoResponse());
+        when(agendamentoService.buscaAgendamentos(42L)).thenReturn(expected);
+
+        var response = agendamentoController.buscaMeusAgendamentos();
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(expected, response.getBody());
+        verify(agendamentoService).buscaAgendamentos(42L);
+    }
+
+    @Test
+    @DisplayName("Deve retornar todos os agendamentos pela consulta administrativa")
+    void deveRetornarTodosAgendamentos() {
+        when(securityUtils.get()).thenReturn(new AuthenticatedUser(7L, "admin@email.com"));
+        List<AgendamentoResponse> expected = List.of(agendamentoResponse());
+        when(agendamentoService.buscaTodosAgendamentos(7L)).thenReturn(expected);
+
+        var response = agendamentoController.buscaAgendamentos();
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(expected, response.getBody());
+        verify(agendamentoService).buscaTodosAgendamentos(7L);
+    }
+
+    private AgendamentoResponse agendamentoResponse() {
+        Sala sala = Sala.builder()
+                .id(12L)
+                .nome("Sala Focus")
+                .capacidade(8)
+                .disponivel(true)
+                .build();
+
+        return new AgendamentoResponse(
+                sala,
+                LocalDate.now().plusDays(1),
+                LocalDateTime.now(),
+                LocalTime.of(9, 0),
+                LocalTime.of(10, 0),
+                4,
+                "Reunião de alinhamento",
+                null,
+                StatusAgendamento.CONFIRMADO
+        );
     }
 }

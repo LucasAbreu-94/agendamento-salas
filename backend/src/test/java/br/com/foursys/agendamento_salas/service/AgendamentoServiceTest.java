@@ -5,6 +5,7 @@ import br.com.foursys.agendamento_salas.domain.Log;
 import br.com.foursys.agendamento_salas.domain.Sala;
 import br.com.foursys.agendamento_salas.domain.Usuario;
 import br.com.foursys.agendamento_salas.dto.request.CriarAgendamentoRequest;
+import br.com.foursys.agendamento_salas.dto.response.AgendamentoResponse;
 import br.com.foursys.agendamento_salas.dto.response.ConfimacaoAgendamentoResponse;
 import br.com.foursys.agendamento_salas.enums.PerfilUsuario;
 import br.com.foursys.agendamento_salas.enums.StatusAgendamento;
@@ -15,6 +16,7 @@ import br.com.foursys.agendamento_salas.exception.SalaInexistenteException;
 import br.com.foursys.agendamento_salas.exception.UsuarioInexistenteException;
 import br.com.foursys.agendamento_salas.exception.UsuarioSemPermissaoException;
 import br.com.foursys.agendamento_salas.exception.ValidacaoBuscaException;
+import br.com.foursys.agendamento_salas.mapper.AgendamentoMapper;
 import br.com.foursys.agendamento_salas.repository.AgendamentoRepository;
 import br.com.foursys.agendamento_salas.repository.LogRepository;
 import br.com.foursys.agendamento_salas.repository.SalaRepository;
@@ -30,6 +32,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -37,8 +40,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("AgendamentoService - Fluxo de criação de agendamento")
@@ -52,6 +56,8 @@ class AgendamentoServiceTest {
     private SalaRepository salaRepository;
     @Mock
     private LogRepository logRepository;
+    @Mock
+    private AgendamentoMapper agendamentoMapper;
 
     private AgendamentoService service;
 
@@ -61,7 +67,8 @@ class AgendamentoServiceTest {
                 agendamentoRepository,
                 usuarioRepository,
                 salaRepository,
-                logRepository
+                logRepository,
+                agendamentoMapper
         );
     }
 
@@ -78,6 +85,11 @@ class AgendamentoServiceTest {
                     sala, null, LocalTime.of(9, 0), LocalTime.of(11, 0), 8
             );
             prepararCriacao(usuario, sala, request);
+            when(agendamentoRepository.save(any(Agendamento.class))).thenAnswer(invocation -> {
+                Agendamento salvo = invocation.getArgument(0);
+                salvo.setId(99L);
+                return salvo;
+            });
 
             ConfimacaoAgendamentoResponse confirmacao = service.create(request, 7L);
 
@@ -88,6 +100,7 @@ class AgendamentoServiceTest {
 
             Agendamento agendamento = agendamentoCaptor.getValue();
             Log log = logCaptor.getValue();
+            assertThat(confirmacao.id()).isEqualTo(99L);
             assertThat(confirmacao.status()).isEqualTo(StatusAgendamento.CONFIRMADO);
             assertThat(confirmacao.sala()).isEqualTo(sala);
             assertThat(confirmacao.inicio()).isEqualTo(request.horaInicio());
@@ -276,6 +289,80 @@ class AgendamentoServiceTest {
         }
     }
 
+    @Nested
+    @DisplayName("Consulta de agendamentos")
+    class BookingQueries {
+
+        @Test
+        @DisplayName("Deve retornar os agendamentos do usuário autenticado")
+        void deveRetornarAgendamentosDoUsuarioAutenticado() {
+            Usuario usuario = usuario(7L, PerfilUsuario.USER);
+            Agendamento agendamento = agendamento(12L);
+            AgendamentoResponse responseEsperada = agendamentoResponse();
+            when(usuarioRepository.findById(7L)).thenReturn(Optional.of(usuario));
+            when(agendamentoRepository.findByUsuarioId_Id(7L)).thenReturn(List.of(agendamento));
+            when(agendamentoMapper.entityToResponse(agendamento)).thenReturn(responseEsperada);
+
+            List<AgendamentoResponse> resultado = service.buscaAgendamentos(7L);
+
+            assertThat(resultado).containsExactly(responseEsperada);
+            verify(agendamentoRepository).findByUsuarioId_Id(7L);
+            verify(agendamentoMapper).entityToResponse(agendamento);
+            verifyNoMoreInteractions(agendamentoRepository, agendamentoMapper);
+        }
+
+        @Test
+        @DisplayName("Deve rejeitar a consulta pessoal quando o usuário autenticado não existe")
+        void deveRejeitarConsultaPessoalQuandoUsuarioNaoExiste() {
+            when(usuarioRepository.findById(7L)).thenReturn(Optional.empty());
+
+            assertThrows(UsuarioInexistenteException.class, () -> service.buscaAgendamentos(7L));
+
+            verifyNoInteractions(agendamentoRepository, agendamentoMapper);
+        }
+
+        @Test
+        @DisplayName("Deve retornar todos os agendamentos quando a consulta for feita por administrador")
+        void deveRetornarTodosAgendamentosParaAdministrador() {
+            Usuario admin = usuario(7L, PerfilUsuario.ADMIN);
+            Agendamento primeiro = agendamento(12L);
+            Agendamento segundo = agendamento(13L);
+            AgendamentoResponse primeiraResposta = agendamentoResponse();
+            AgendamentoResponse segundaResposta = agendamentoResponse();
+            when(usuarioRepository.findById(7L)).thenReturn(Optional.of(admin));
+            when(agendamentoRepository.findAll()).thenReturn(List.of(primeiro, segundo));
+            when(agendamentoMapper.entityToResponse(primeiro)).thenReturn(primeiraResposta);
+            when(agendamentoMapper.entityToResponse(segundo)).thenReturn(segundaResposta);
+
+            List<AgendamentoResponse> resultado = service.buscaTodosAgendamentos(7L);
+
+            assertThat(resultado).containsExactly(primeiraResposta, segundaResposta);
+            verify(agendamentoRepository).findAll();
+            verify(agendamentoMapper).entityToResponse(primeiro);
+            verify(agendamentoMapper).entityToResponse(segundo);
+        }
+
+        @Test
+        @DisplayName("Deve rejeitar consulta geral quando o usuário não for administrador")
+        void deveRejeitarConsultaGeralParaUsuarioComum() {
+            when(usuarioRepository.findById(7L)).thenReturn(Optional.of(usuario(7L, PerfilUsuario.USER)));
+
+            assertThrows(UsuarioSemPermissaoException.class, () -> service.buscaTodosAgendamentos(7L));
+
+            verifyNoInteractions(agendamentoRepository, agendamentoMapper);
+        }
+
+        @Test
+        @DisplayName("Deve rejeitar consulta geral quando o usuário autenticado não existe")
+        void deveRejeitarConsultaGeralQuandoUsuarioNaoExiste() {
+            when(usuarioRepository.findById(7L)).thenReturn(Optional.empty());
+
+            assertThrows(UsuarioInexistenteException.class, () -> service.buscaTodosAgendamentos(7L));
+
+            verifyNoInteractions(agendamentoRepository, agendamentoMapper);
+        }
+    }
+
     private void prepararCriacao(
             Usuario usuario,
             Sala sala,
@@ -305,6 +392,34 @@ class AgendamentoServiceTest {
                 .disponivel(disponivel)
                 .capacidade(capacidade)
                 .build();
+    }
+
+    private Agendamento agendamento(Long id) {
+        return Agendamento.builder()
+                .id(id)
+                .usuarioId(usuario(7L, PerfilUsuario.USER))
+                .salaId(sala(12L))
+                .dataAgendamento(LocalDate.now().plusDays(1))
+                .horaInicio(LocalTime.of(9, 0))
+                .horaFim(LocalTime.of(10, 0))
+                .qntdPessoas(4)
+                .titulo("Alinhamento")
+                .status(StatusAgendamento.CONFIRMADO)
+                .build();
+    }
+
+    private AgendamentoResponse agendamentoResponse() {
+        return new AgendamentoResponse(
+                sala(12L),
+                LocalDate.now().plusDays(1),
+                LocalDate.now().atStartOfDay(),
+                LocalTime.of(9, 0),
+                LocalTime.of(10, 0),
+                4,
+                "Alinhamento",
+                null,
+                StatusAgendamento.CONFIRMADO
+        );
     }
 
     private CriarAgendamentoRequest request(
