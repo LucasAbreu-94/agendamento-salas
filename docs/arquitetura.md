@@ -43,6 +43,15 @@ Erros seguem o modelo padrão de `docs/contratos-api.md`.
 
 Os testes ativam o profile com `@ActiveProfiles("test")`. Novas classes de teste precisam do mesmo annotation.
 
+O profile Maven `coverage` gera o relatório JaCoCo e valida cobertura mínima de 90% das linhas:
+
+```powershell
+cd backend
+.\mvnw.cmd -Pcoverage test
+```
+
+O relatório HTML fica em `backend/target/site/jacoco/index.html`.
+
 ## Estrutura do frontend
 
 `frontend/src/app` segue `core/`, `shared/` e `features/` (ver `frontend/AGENTS.md`). A base atual cria a feature `features/agendamento` com rota padrão. Os ambientes ficam em `frontend/src/environments`, com troca via `fileReplacements` na build de produção.
