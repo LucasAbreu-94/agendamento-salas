@@ -1,7 +1,6 @@
 package br.com.foursys.agendamento_salas.controller;
 
 import br.com.foursys.agendamento_salas.dto.request.CriarAgendamentoRequest;
-import br.com.foursys.agendamento_salas.security.AuthenticatedUser;
 import br.com.foursys.agendamento_salas.security.SecurityUtils;
 import br.com.foursys.agendamento_salas.service.AgendamentoService;
 import org.springframework.http.HttpStatus;
@@ -16,19 +15,17 @@ import org.springframework.web.bind.annotation.RestController;
 public class AgendamentoController {
 
     private final AgendamentoService agendamentoService;
-    private final SecurityUtils securityUtils;
 
-    public AgendamentoController(AgendamentoService agendamentoService, SecurityUtils securityUtils) {
+    public AgendamentoController(AgendamentoService agendamentoService) {
         this.agendamentoService = agendamentoService;
-        this.securityUtils = securityUtils;
     }
 
     @PostMapping
     public ResponseEntity<Void> create(
-            @RequestBody CriarAgendamentoRequest agendamentoRequest
+            @RequestBody CriarAgendamentoRequest agendamentoRequest,
+            SecurityUtils usuario
     ) {
-
-        Long usuarioAutenticado = securityUtils.get().id();
+        Long usuarioAutenticado = usuario.get().id();
 
         agendamentoService.create(agendamentoRequest, usuarioAutenticado);
 

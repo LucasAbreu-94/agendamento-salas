@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
@@ -21,8 +20,7 @@ public class Log {
     @JoinColumn(name = "usuario_id")
     private Usuario usuario;
 
-    private LocalDate dataAgendamento;
-    private LocalDateTime dataCriacao;
+    private LocalDateTime dataAgendamento;
 
     @ManyToOne
     @JoinColumn(name = "sala_agendamento")

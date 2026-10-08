@@ -98,35 +98,6 @@ public class GlobalExceptionHandler {
 		return ResponseEntity
 				.status(HttpStatus.NOT_FOUND)
 				.body(error);
-	}
 
-	@ExceptionHandler(SalaIndisponivelException.class)
-	public ResponseEntity<ErrorResponse> handleSalaIndisponivel(
-			SalaIndisponivelException exception
-	){
-		ErrorResponse error = new ErrorResponse(
-				HttpStatus.BAD_REQUEST.value(),
-				exception.getMessage(),
-				LocalDateTime.now()
-		);
-
-		return ResponseEntity
-				.status(HttpStatus.BAD_REQUEST)
-				.body(error);
-	}
-
-	@ExceptionHandler(HorarioAgendamentoInvalidoException.class)
-	public ResponseEntity<ErrorResponse> handleSalaIndisponivel(
-			HorarioAgendamentoInvalidoException exception
-	){
-		ErrorResponse error = new ErrorResponse(
-				HttpStatus.BAD_REQUEST.value(),
-				exception.getMessage(),
-				LocalDateTime.now()
-		);
-
-		return ResponseEntity
-				.status(HttpStatus.BAD_REQUEST)
-				.body(error);
 	}
 }
