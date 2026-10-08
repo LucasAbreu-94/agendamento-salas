@@ -55,6 +55,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/salas/**").permitAll()
                         .requestMatchers("/api/ollama/**").permitAll()
                         .requestMatchers("/api/salas/admin/criar").hasAnyRole("ADMIN")
+                        .requestMatchers("/api/agendamento/busca/todos").hasAnyRole("ADMIN")
                         .requestMatchers("/api/usuarios").hasAnyRole("ADMIN")
                         .anyRequest().authenticated()
                 )

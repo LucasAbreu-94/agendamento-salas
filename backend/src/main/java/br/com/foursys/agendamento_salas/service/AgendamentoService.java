@@ -1,6 +1,7 @@
 package br.com.foursys.agendamento_salas.service;
 
 import br.com.foursys.agendamento_salas.dto.request.CriarAgendamentoRequest;
+import br.com.foursys.agendamento_salas.dto.response.AgendamentoResponse;
 import br.com.foursys.agendamento_salas.dto.response.ConfimacaoAgendamentoResponse;
 import br.com.foursys.agendamento_salas.enums.PerfilUsuario;
 import br.com.foursys.agendamento_salas.enums.StatusAgendamento;
@@ -9,6 +10,7 @@ import br.com.foursys.agendamento_salas.domain.Log;
 import br.com.foursys.agendamento_salas.domain.Sala;
 import br.com.foursys.agendamento_salas.domain.Usuario;
 import br.com.foursys.agendamento_salas.exception.*;
+import br.com.foursys.agendamento_salas.mapper.AgendamentoMapper;
 import br.com.foursys.agendamento_salas.repository.AgendamentoRepository;
 import br.com.foursys.agendamento_salas.repository.LogRepository;
 import br.com.foursys.agendamento_salas.repository.SalaRepository;
@@ -20,6 +22,7 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.List;
 
 
 @Service
@@ -29,12 +32,14 @@ public class AgendamentoService {
     private final UsuarioRepository usuarioRepository;
     private final SalaRepository salaRepository;
     private final LogRepository logRepository;
+    private final AgendamentoMapper agendamentoMapper;
 
-    public AgendamentoService(AgendamentoRepository agendamentoRepository, UsuarioRepository usuarioRepository, SalaRepository salaRepository, LogRepository logRepository) {
+    public AgendamentoService(AgendamentoRepository agendamentoRepository, UsuarioRepository usuarioRepository, SalaRepository salaRepository, LogRepository logRepository, AgendamentoMapper agendamentoMapper) {
         this.agendamentoRepository = agendamentoRepository;
         this.usuarioRepository = usuarioRepository;
         this.salaRepository = salaRepository;
         this.logRepository = logRepository;
+        this.agendamentoMapper = agendamentoMapper;
     }
 
     @Transactional
@@ -107,6 +112,35 @@ public class AgendamentoService {
                 .status(agendamento.getStatus())
                 .solicitante(agendamento.getUsuarioIdSolicitante())
                 .build();
+    }
+
+    public List<AgendamentoResponse> buscaAgendamentos(Long usuarioAutenticado) {
+        usuarioRepository.findById(usuarioAutenticado)
+                .orElseThrow(UsuarioInexistenteException::new);
+
+        List<Agendamento> listaAgendamento = agendamentoRepository.findByUsuarioId_Id(usuarioAutenticado);
+
+        return listaAgendamento
+                .stream()
+                .map(agendamentoMapper::entityToResponse)
+                .toList();
+    }
+
+    //Somente ADMIN
+    public List<AgendamentoResponse> buscaTodosAgendamentos(Long usuarioAutenticado) {
+        Usuario usuario = usuarioRepository.findById(usuarioAutenticado)
+                .orElseThrow(UsuarioInexistenteException::new);
+
+        if(usuario.getPerfilUsuario() != PerfilUsuario.ADMIN) {
+            throw new UsuarioSemPermissaoException();
+        }
+
+        List<Agendamento> listaAgendamento = agendamentoRepository.findAll();
+
+        return listaAgendamento
+                .stream()
+                .map(agendamentoMapper::entityToResponse)
+                .toList();
     }
 
 //  Métodos Utilitarios
