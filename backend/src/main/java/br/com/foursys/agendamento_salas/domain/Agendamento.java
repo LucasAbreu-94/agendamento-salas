@@ -2,15 +2,15 @@ package br.com.foursys.agendamento_salas.domain;
 
 import br.com.foursys.agendamento_salas.enums.StatusAgendamento;
 import jakarta.persistence.*;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Getter
 @Setter
 @Entity
