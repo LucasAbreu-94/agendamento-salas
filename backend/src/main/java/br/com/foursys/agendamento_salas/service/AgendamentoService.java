@@ -1,6 +1,7 @@
 package br.com.foursys.agendamento_salas.service;
 
 import br.com.foursys.agendamento_salas.dto.request.CriarAgendamentoRequest;
+import br.com.foursys.agendamento_salas.dto.response.ConfimacaoAgendamentoResponse;
 import br.com.foursys.agendamento_salas.enums.PerfilUsuario;
 import br.com.foursys.agendamento_salas.enums.StatusAgendamento;
 import br.com.foursys.agendamento_salas.domain.Agendamento;
@@ -37,7 +38,7 @@ public class AgendamentoService {
     }
 
     @Transactional
-    public void create(CriarAgendamentoRequest agendamentoRequest, Long idUsuario) {
+    public ConfimacaoAgendamentoResponse create(CriarAgendamentoRequest agendamentoRequest, Long idUsuario) {
         Usuario usuario = usuarioRepository.findById(idUsuario)
                 .orElseThrow(UsuarioInexistenteException::new);
 
@@ -97,6 +98,15 @@ public class AgendamentoService {
                 .build();
 
         logRepository.save(log);
+
+        return ConfimacaoAgendamentoResponse.builder()
+                .id(agendamento.getId())
+                .sala(agendamento.getSalaId())
+                .inicio(agendamento.getHoraInicio())
+                .fim(agendamento.getHoraFim())
+                .status(agendamento.getStatus())
+                .solicitante(agendamento.getUsuarioIdSolicitante())
+                .build();
     }
 
 //  Métodos Utilitarios

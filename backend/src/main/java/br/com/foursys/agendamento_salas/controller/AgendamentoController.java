@@ -1,6 +1,7 @@
 package br.com.foursys.agendamento_salas.controller;
 
 import br.com.foursys.agendamento_salas.dto.request.CriarAgendamentoRequest;
+import br.com.foursys.agendamento_salas.dto.response.ConfimacaoAgendamentoResponse;
 import br.com.foursys.agendamento_salas.security.AuthenticatedUser;
 import br.com.foursys.agendamento_salas.security.SecurityUtils;
 import br.com.foursys.agendamento_salas.service.AgendamentoService;
@@ -24,16 +25,16 @@ public class AgendamentoController {
     }
 
     @PostMapping
-    public ResponseEntity<Void> create(
+    public ResponseEntity<ConfimacaoAgendamentoResponse> create(
             @RequestBody CriarAgendamentoRequest agendamentoRequest
     ) {
 
         Long usuarioAutenticado = securityUtils.get().id();
 
-        agendamentoService.create(agendamentoRequest, usuarioAutenticado);
+        ConfimacaoAgendamentoResponse response = agendamentoService.create(agendamentoRequest, usuarioAutenticado);
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .build();
+                .body(response);
     }
 }
