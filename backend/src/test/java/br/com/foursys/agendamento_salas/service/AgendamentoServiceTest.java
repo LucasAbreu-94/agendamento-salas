@@ -5,6 +5,7 @@ import br.com.foursys.agendamento_salas.domain.Log;
 import br.com.foursys.agendamento_salas.domain.Sala;
 import br.com.foursys.agendamento_salas.domain.Usuario;
 import br.com.foursys.agendamento_salas.dto.request.CriarAgendamentoRequest;
+import br.com.foursys.agendamento_salas.dto.response.ConfimacaoAgendamentoResponse;
 import br.com.foursys.agendamento_salas.enums.PerfilUsuario;
 import br.com.foursys.agendamento_salas.enums.StatusAgendamento;
 import br.com.foursys.agendamento_salas.exception.CapacidadeNaoSuportadaException;
@@ -69,7 +70,7 @@ class AgendamentoServiceTest {
     class SuccessfulScenarios {
 
         @Test
-        @DisplayName("Deve criar o agendamento e registrar o log no limite de duas horas")
+        @DisplayName("Deve criar o agendamento e devolver a confirmação do novo fluxo")
         void deveCriarAgendamentoERegistrarLogParaUsuarioAutenticado() {
             Usuario usuario = usuario(7L, PerfilUsuario.USER);
             Sala sala = sala(12L);
@@ -78,7 +79,7 @@ class AgendamentoServiceTest {
             );
             prepararCriacao(usuario, sala, request);
 
-            service.create(request, 7L);
+            ConfimacaoAgendamentoResponse confirmacao = service.create(request, 7L);
 
             ArgumentCaptor<Agendamento> agendamentoCaptor = ArgumentCaptor.forClass(Agendamento.class);
             ArgumentCaptor<Log> logCaptor = ArgumentCaptor.forClass(Log.class);
@@ -87,9 +88,12 @@ class AgendamentoServiceTest {
 
             Agendamento agendamento = agendamentoCaptor.getValue();
             Log log = logCaptor.getValue();
+            assertThat(confirmacao.status()).isEqualTo(StatusAgendamento.CONFIRMADO);
+            assertThat(confirmacao.sala()).isEqualTo(sala);
+            assertThat(confirmacao.inicio()).isEqualTo(request.horaInicio());
+            assertThat(confirmacao.fim()).isEqualTo(request.horaFim());
             assertThat(agendamento.getUsuarioId()).isEqualTo(usuario);
             assertThat(agendamento.getSalaId()).isEqualTo(sala);
-            assertThat(agendamento.getStatus()).isEqualTo(StatusAgendamento.CONFIRMADO);
             assertThat(agendamento.getTitulo()).isEqualTo("Alinhamento");
             assertThat(agendamento.getQntdPessoas()).isEqualTo(8);
             assertThat(agendamento.getDataCriacao()).isNotNull();
