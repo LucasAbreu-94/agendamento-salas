@@ -1,4 +1,4 @@
-package br.com.foursys.agendamento_salas.repository;
+package br.com.foursys.agendamento_salas.infrastructure.persistence.repository;
 
 import br.com.foursys.agendamento_salas.domain.Log;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -6,10 +6,9 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 
-public interface LogRepository extends JpaRepository<Log, Long> {
+public interface LogJpaRepository extends JpaRepository<Log, Long> {
     @Query("""
     SELECT CASE WHEN COUNT(l) > 0 THEN true ELSE false END
     FROM Log l

@@ -11,10 +11,10 @@ import br.com.foursys.agendamento_salas.domain.Sala;
 import br.com.foursys.agendamento_salas.domain.Usuario;
 import br.com.foursys.agendamento_salas.exception.*;
 import br.com.foursys.agendamento_salas.mapper.AgendamentoMapper;
-import br.com.foursys.agendamento_salas.repository.AgendamentoRepository;
-import br.com.foursys.agendamento_salas.repository.LogRepository;
-import br.com.foursys.agendamento_salas.repository.SalaRepository;
-import br.com.foursys.agendamento_salas.repository.UsuarioRepository;
+import br.com.foursys.agendamento_salas.port.out.AgendamentoRepositoryPort;
+import br.com.foursys.agendamento_salas.port.out.LogRepositoryPort;
+import br.com.foursys.agendamento_salas.port.out.SalaRepositoryPort;
+import br.com.foursys.agendamento_salas.port.out.UsuarioRepositoryPort;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
@@ -28,26 +28,27 @@ import java.util.List;
 @Service
 public class AgendamentoService {
 
-    private final AgendamentoRepository agendamentoRepository;
-    private final UsuarioRepository usuarioRepository;
-    private final SalaRepository salaRepository;
-    private final LogRepository logRepository;
+    private final AgendamentoRepositoryPort agendamentoRepositoryPort;
+    private final LogRepositoryPort logRepositoryPort;
+    private final SalaRepositoryPort salaRepositoryPort;
+    private final UsuarioRepositoryPort usuarioRepositoryPort;
+
     private final AgendamentoMapper agendamentoMapper;
 
-    public AgendamentoService(AgendamentoRepository agendamentoRepository, UsuarioRepository usuarioRepository, SalaRepository salaRepository, LogRepository logRepository, AgendamentoMapper agendamentoMapper) {
-        this.agendamentoRepository = agendamentoRepository;
-        this.usuarioRepository = usuarioRepository;
-        this.salaRepository = salaRepository;
-        this.logRepository = logRepository;
+    public AgendamentoService(AgendamentoRepositoryPort agendamentoRepositoryPort, LogRepositoryPort logRepositoryPort, SalaRepositoryPort salaRepositoryPort, UsuarioRepositoryPort usuarioRepositoryPort,
+                              AgendamentoMapper agendamentoMapper) {
+        this.agendamentoRepositoryPort = agendamentoRepositoryPort;
+        this.logRepositoryPort = logRepositoryPort;
+        this.salaRepositoryPort = salaRepositoryPort;
+        this.usuarioRepositoryPort = usuarioRepositoryPort;
         this.agendamentoMapper = agendamentoMapper;
     }
 
     @Transactional
     public ConfimacaoAgendamentoResponse create(CriarAgendamentoRequest agendamentoRequest, Long idUsuario) {
-        Usuario usuario = usuarioRepository.findById(idUsuario)
-                .orElseThrow(UsuarioInexistenteException::new);
+        Usuario usuario = buscarUsuario(idUsuario);
 
-        Sala sala = salaRepository.findById(agendamentoRequest.salaId().getId())
+        Sala sala = salaRepositoryPort.buscarPorId(agendamentoRequest.salaId().getId())
                 .orElseThrow(SalaInexistenteException::new);
 
         validarQuantidadeHorasAgendamento(agendamentoRequest.horaInicio(),
@@ -83,14 +84,14 @@ public class AgendamentoService {
             if(!usuario.getPerfilUsuario().equals(PerfilUsuario.ADMIN)) {
                 throw new UsuarioSemPermissaoException();
             } else {
-                usuarioRepository.findById(agendamentoRequest.usuarioIdSolicitante().getId())
+                usuarioRepositoryPort.buscarPorId(agendamentoRequest.usuarioIdSolicitante().getId())
                         .orElseThrow(UsuarioInexistenteException::new);
 
                 agendamento.setUsuarioIdSolicitante(agendamentoRequest.usuarioIdSolicitante());
             }
         }
 
-        agendamentoRepository.save(agendamento);
+        agendamentoRepositoryPort.salvar(agendamento);
 
         Log log = Log
                 .builder()
@@ -102,7 +103,7 @@ public class AgendamentoService {
                 .horaFimAgendamento(agendamento.getHoraFim())
                 .build();
 
-        logRepository.save(log);
+        logRepositoryPort.salvar(log);
 
         return ConfimacaoAgendamentoResponse.builder()
                 .id(agendamento.getId())
@@ -115,10 +116,9 @@ public class AgendamentoService {
     }
 
     public List<AgendamentoResponse> buscaAgendamentos(Long usuarioAutenticado) {
-        usuarioRepository.findById(usuarioAutenticado)
-                .orElseThrow(UsuarioInexistenteException::new);
+        buscarUsuario(usuarioAutenticado);
 
-        List<Agendamento> listaAgendamento = agendamentoRepository.findByUsuarioId_Id(usuarioAutenticado);
+        List<Agendamento> listaAgendamento = agendamentoRepositoryPort.buscarUsuarioId(usuarioAutenticado);
 
         return listaAgendamento
                 .stream()
@@ -128,14 +128,13 @@ public class AgendamentoService {
 
     //Somente ADMIN
     public List<AgendamentoResponse> buscaTodosAgendamentos(Long usuarioAutenticado) {
-        Usuario usuario = usuarioRepository.findById(usuarioAutenticado)
-                .orElseThrow(UsuarioInexistenteException::new);
+        Usuario usuario = buscarUsuario(usuarioAutenticado);
 
         if(usuario.getPerfilUsuario() != PerfilUsuario.ADMIN) {
             throw new UsuarioSemPermissaoException();
         }
 
-        List<Agendamento> listaAgendamento = agendamentoRepository.findAll();
+        List<Agendamento> listaAgendamento = agendamentoRepositoryPort.buscarTodos();
 
         return listaAgendamento
                 .stream()
@@ -164,7 +163,7 @@ public class AgendamentoService {
     }
 
     private void validarConflitoHorario(Long idSala, LocalDate dataAgendamento, LocalTime horaInicio, LocalTime horaFim) {
-        boolean conflito = logRepository.existeConflito(idSala, dataAgendamento, horaInicio, horaFim);
+        boolean conflito = logRepositoryPort.existeConflito(idSala, dataAgendamento, horaInicio, horaFim);
 
         if(conflito) {
             throw new SalaIndisponivelException();
@@ -175,5 +174,10 @@ public class AgendamentoService {
         if(horaInicio.isAfter(horaFim)) {
             throw new HorarioAgendamentoInvalidoException();
         }
+    }
+
+    private Usuario buscarUsuario(Long id) {
+        return usuarioRepositoryPort.buscarPorId(id)
+                .orElseThrow(UsuarioInexistenteException::new);
     }
 }
