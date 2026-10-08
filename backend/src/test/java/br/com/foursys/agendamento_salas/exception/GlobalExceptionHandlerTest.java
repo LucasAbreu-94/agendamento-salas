@@ -70,6 +70,16 @@ class GlobalExceptionHandlerTest {
     }
 
     @Test
+    void deveConverterCapacidadeNaoSuportadaEmBadRequest() {
+        var response = handler.handleCapacidadeNaoSuportadaException(new CapacidadeNaoSuportadaException());
+
+        assertEquals(400, response.getStatusCode().value());
+        assertEquals(400, response.getBody().status());
+        assertEquals("Capacidade máxima da sala ultrapassada.", response.getBody().message());
+        assertNotNull(response.getBody().timestamp());
+    }
+
+    @Test
     void deveConverterHorarioInvalidoEmBadRequest() {
         var response = handler.handleSalaIndisponivel(new HorarioAgendamentoInvalidoException());
 

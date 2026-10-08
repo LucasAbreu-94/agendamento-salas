@@ -15,8 +15,10 @@ import br.com.foursys.agendamento_salas.repository.UsuarioRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 
 @Service
@@ -42,16 +44,20 @@ public class AgendamentoService {
         Sala sala = salaRepository.findById(agendamentoRequest.salaId().getId())
                 .orElseThrow(SalaInexistenteException::new);
 
-        boolean conflito = logRepository.existeConflito(sala.getId(), agendamentoRequest.data(),
-                agendamentoRequest.horaInicio(), agendamentoRequest.horaFim());
+        validarQuantidadeHorasAgendamento(agendamentoRequest.horaInicio(),
+                agendamentoRequest.horaFim(), usuario.getPerfilUsuario());
 
-        if(conflito) {
+        validarCapacidadeMaximaSala(agendamentoRequest.qntdPessoas(), sala.getCapacidade());
+
+        validarConflitoHorario(sala.getId(), agendamentoRequest.data(), agendamentoRequest.horaInicio(),
+                agendamentoRequest.horaFim());
+
+        if(!sala.getDisponivel()) {
             throw new SalaIndisponivelException();
         }
 
-        if(agendamentoRequest.horaInicio().isAfter(agendamentoRequest.horaFim())) {
-            throw new HorarioAgendamentoInvalidoException();
-        }
+        //Hora inicial anterior à final.
+        validarHorarioAgendamento(agendamentoRequest.horaInicio(), agendamentoRequest.horaFim());
 
         Agendamento agendamento = Agendamento
                 .builder()
@@ -91,5 +97,39 @@ public class AgendamentoService {
                 .build();
 
         logRepository.save(log);
+    }
+
+//  Métodos Utilitarios
+    private long calcularDuracao(LocalTime inicio, LocalTime fim) {
+        return Duration.between(inicio, fim).toMinutes();
+    }
+
+    private void validarQuantidadeHorasAgendamento(LocalTime horaInicio, LocalTime horaFim, PerfilUsuario perfilUsuario) {
+        if (calcularDuracao(horaInicio, horaFim) > 120
+                && perfilUsuario != PerfilUsuario.ADMIN) {
+            throw new ValidacaoBuscaException(
+                    "A duração não pode ser maior que 2 horas."
+            );
+        }
+    }
+
+    private void validarCapacidadeMaximaSala(int qtdPessoas, int capacidadeSala) {
+        if(qtdPessoas > capacidadeSala) {
+            throw new CapacidadeNaoSuportadaException();
+        }
+    }
+
+    private void validarConflitoHorario(Long idSala, LocalDate dataAgendamento, LocalTime horaInicio, LocalTime horaFim) {
+        boolean conflito = logRepository.existeConflito(idSala, dataAgendamento, horaInicio, horaFim);
+
+        if(conflito) {
+            throw new SalaIndisponivelException();
+        }
+    }
+
+    private void validarHorarioAgendamento(LocalTime horaInicio, LocalTime horaFim) {
+        if(horaInicio.isAfter(horaFim)) {
+            throw new HorarioAgendamentoInvalidoException();
+        }
     }
 }

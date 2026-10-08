@@ -129,4 +129,19 @@ public class GlobalExceptionHandler {
 				.status(HttpStatus.BAD_REQUEST)
 				.body(error);
 	}
+
+	@ExceptionHandler(CapacidadeNaoSuportadaException.class)
+	public ResponseEntity<ErrorResponse> handleCapacidadeNaoSuportadaException(
+			CapacidadeNaoSuportadaException exception
+	){
+		ErrorResponse error = new ErrorResponse(
+				HttpStatus.BAD_REQUEST.value(),
+				exception.getMessage(),
+				LocalDateTime.now()
+		);
+
+		return ResponseEntity
+				.status(HttpStatus.BAD_REQUEST)
+				.body(error);
+	}
 }
