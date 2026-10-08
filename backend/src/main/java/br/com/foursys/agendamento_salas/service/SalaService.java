@@ -104,10 +104,6 @@ public class SalaService {
     }
 
     private PerfilUsuario perfilDoUsuario(String email) {
-        if (email == null) {
-            return PerfilUsuario.USER;
-        }
-
         Usuario usuario = usuarioRepositoryPort.buscarUsuarioEmail(email)
                 .orElseThrow(UsuarioInexistenteException::new);
 

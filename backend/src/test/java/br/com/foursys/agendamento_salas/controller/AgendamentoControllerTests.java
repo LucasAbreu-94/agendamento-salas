@@ -19,17 +19,18 @@ import static org.mockito.Mockito.when;
 class AgendamentoControllerTests {
 
     private AgendamentoService agendamentoService;
+    private SecurityUtils securityUtils;
     private AgendamentoController agendamentoController;
 
     @BeforeEach
     void setUp() {
         agendamentoService = mock(AgendamentoService.class);
-        agendamentoController = new AgendamentoController(agendamentoService);
+        securityUtils = mock(SecurityUtils.class);
+        agendamentoController = new AgendamentoController(agendamentoService, securityUtils);
     }
 
     @Test
     void deveCriarAgendamentoRetornandoStatus201() {
-        SecurityUtils securityUtils = mock(SecurityUtils.class);
         when(securityUtils.get()).thenReturn(new AuthenticatedUser(42L, "usuario@email.com"));
 
         CriarAgendamentoRequest request = new CriarAgendamentoRequest(
@@ -42,7 +43,7 @@ class AgendamentoControllerTests {
                 "Reunião de alinhamento"
         );
 
-        var response = agendamentoController.create(request, securityUtils);
+        var response = agendamentoController.create(request);
 
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
         verify(agendamentoService).create(request, 42L);
