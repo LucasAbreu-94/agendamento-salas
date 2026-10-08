@@ -17,10 +17,10 @@ import br.com.foursys.agendamento_salas.exception.UsuarioInexistenteException;
 import br.com.foursys.agendamento_salas.exception.UsuarioSemPermissaoException;
 import br.com.foursys.agendamento_salas.exception.ValidacaoBuscaException;
 import br.com.foursys.agendamento_salas.mapper.AgendamentoMapper;
-import br.com.foursys.agendamento_salas.repository.AgendamentoRepository;
-import br.com.foursys.agendamento_salas.repository.LogRepository;
-import br.com.foursys.agendamento_salas.repository.SalaRepository;
-import br.com.foursys.agendamento_salas.repository.UsuarioRepository;
+import br.com.foursys.agendamento_salas.port.out.AgendamentoRepositoryPort;
+import br.com.foursys.agendamento_salas.port.out.LogRepositoryPort;
+import br.com.foursys.agendamento_salas.port.out.SalaRepositoryPort;
+import br.com.foursys.agendamento_salas.port.out.UsuarioRepositoryPort;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -31,6 +31,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
@@ -40,22 +41,21 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("AgendamentoService - Fluxo de criação de agendamento")
+@DisplayName("AgendamentoService - Fluxo de agendamentos")
 class AgendamentoServiceTest {
 
     @Mock
-    private AgendamentoRepository agendamentoRepository;
+    private AgendamentoRepositoryPort agendamentoRepositoryPort;
     @Mock
-    private UsuarioRepository usuarioRepository;
+    private LogRepositoryPort logRepositoryPort;
     @Mock
-    private SalaRepository salaRepository;
+    private SalaRepositoryPort salaRepositoryPort;
     @Mock
-    private LogRepository logRepository;
+    private UsuarioRepositoryPort usuarioRepositoryPort;
     @Mock
     private AgendamentoMapper agendamentoMapper;
 
@@ -64,52 +64,54 @@ class AgendamentoServiceTest {
     @BeforeEach
     void setUp() {
         service = new AgendamentoService(
-                agendamentoRepository,
-                usuarioRepository,
-                salaRepository,
-                logRepository,
+                agendamentoRepositoryPort,
+                logRepositoryPort,
+                salaRepositoryPort,
+                usuarioRepositoryPort,
                 agendamentoMapper
         );
     }
 
     @Nested
-    @DisplayName("Criação válida")
-    class SuccessfulScenarios {
+    @DisplayName("Criação de agendamentos")
+    class CreateBooking {
 
         @Test
-        @DisplayName("Deve criar o agendamento e devolver a confirmação do novo fluxo")
-        void deveCriarAgendamentoERegistrarLogParaUsuarioAutenticado() {
+        @DisplayName("Deve salvar o agendamento, registrar log e retornar confirmação para usuário comum")
+        void deveCriarAgendamentoEDevolverConfirmacao() {
             Usuario usuario = usuario(7L, PerfilUsuario.USER);
             Sala sala = sala(12L);
             CriarAgendamentoRequest request = request(
                     sala, null, LocalTime.of(9, 0), LocalTime.of(11, 0), 8
             );
             prepararCriacao(usuario, sala, request);
-            when(agendamentoRepository.save(any(Agendamento.class))).thenAnswer(invocation -> {
+            when(agendamentoRepositoryPort.salvar(any(Agendamento.class))).thenAnswer(invocation -> {
                 Agendamento salvo = invocation.getArgument(0);
                 salvo.setId(99L);
                 return salvo;
             });
 
-            ConfimacaoAgendamentoResponse confirmacao = service.create(request, 7L);
+            ConfimacaoAgendamentoResponse confirmacao = service.create(request, usuario.getId());
 
             ArgumentCaptor<Agendamento> agendamentoCaptor = ArgumentCaptor.forClass(Agendamento.class);
             ArgumentCaptor<Log> logCaptor = ArgumentCaptor.forClass(Log.class);
-            verify(agendamentoRepository).save(agendamentoCaptor.capture());
-            verify(logRepository).save(logCaptor.capture());
+            verify(agendamentoRepositoryPort).salvar(agendamentoCaptor.capture());
+            verify(logRepositoryPort).salvar(logCaptor.capture());
 
-            Agendamento agendamento = agendamentoCaptor.getValue();
+            Agendamento salvo = agendamentoCaptor.getValue();
             Log log = logCaptor.getValue();
             assertThat(confirmacao.id()).isEqualTo(99L);
-            assertThat(confirmacao.status()).isEqualTo(StatusAgendamento.CONFIRMADO);
             assertThat(confirmacao.sala()).isEqualTo(sala);
             assertThat(confirmacao.inicio()).isEqualTo(request.horaInicio());
             assertThat(confirmacao.fim()).isEqualTo(request.horaFim());
-            assertThat(agendamento.getUsuarioId()).isEqualTo(usuario);
-            assertThat(agendamento.getSalaId()).isEqualTo(sala);
-            assertThat(agendamento.getTitulo()).isEqualTo("Alinhamento");
-            assertThat(agendamento.getQntdPessoas()).isEqualTo(8);
-            assertThat(agendamento.getDataCriacao()).isNotNull();
+            assertThat(confirmacao.status()).isEqualTo(StatusAgendamento.CONFIRMADO);
+            assertThat(confirmacao.solicitante()).isNull();
+            assertThat(salvo.getUsuarioId()).isEqualTo(usuario);
+            assertThat(salvo.getSalaId()).isEqualTo(sala);
+            assertThat(salvo.getDataAgendamento()).isEqualTo(request.data());
+            assertThat(salvo.getTitulo()).isEqualTo(request.titulo());
+            assertThat(salvo.getQntdPessoas()).isEqualTo(8);
+            assertThat(salvo.getDataCriacao()).isNotNull();
             assertThat(log.getUsuario()).isEqualTo(usuario);
             assertThat(log.getSalaAgendamento()).isEqualTo(sala);
             assertThat(log.getDataAgendamento()).isEqualTo(request.data());
@@ -118,85 +120,52 @@ class AgendamentoServiceTest {
         }
 
         @Test
-        @DisplayName("Deve permitir que um administrador agende por mais de duas horas para outro usuário")
-        void deveCriarAgendamentoParaSolicitanteQuandoAdmin() {
+        @DisplayName("Deve permitir que administrador faça agendamento longo para outro usuário")
+        void deveCriarAgendamentoLongoParaSolicitanteQuandoAdmin() {
             Usuario admin = usuario(7L, PerfilUsuario.ADMIN);
             Usuario solicitante = usuario(8L, PerfilUsuario.USER);
             Sala sala = sala(12L);
             CriarAgendamentoRequest request = request(
-                    sala,
-                    solicitante,
-                    LocalTime.of(9, 0),
-                    LocalTime.of(12, 0)
+                    sala, solicitante, LocalTime.of(9, 0), LocalTime.of(12, 0), 4
             );
             prepararCriacao(admin, sala, request);
-            when(usuarioRepository.findById(8L)).thenReturn(Optional.of(solicitante));
+            when(usuarioRepositoryPort.buscarPorId(solicitante.getId())).thenReturn(Optional.of(solicitante));
 
-            service.create(request, 7L);
+            ConfimacaoAgendamentoResponse confirmacao = service.create(request, admin.getId());
 
             ArgumentCaptor<Agendamento> agendamentoCaptor = ArgumentCaptor.forClass(Agendamento.class);
-            verify(agendamentoRepository).save(agendamentoCaptor.capture());
-            verify(logRepository).save(any(Log.class));
+            verify(agendamentoRepositoryPort).salvar(agendamentoCaptor.capture());
+            verify(logRepositoryPort).salvar(any(Log.class));
             assertThat(agendamentoCaptor.getValue().getUsuarioIdSolicitante()).isEqualTo(solicitante);
+            assertThat(confirmacao.solicitante()).isEqualTo(solicitante);
         }
-    }
-
-    @Nested
-    @DisplayName("Falhas e validações")
-    class ValidationFailures {
 
         @Test
-        @DisplayName("Deve rejeitar o agendamento quando o usuário autenticado não existe")
+        @DisplayName("Deve rejeitar agendamento quando o usuário autenticado não existe")
         void deveRejeitarAgendamentoQuandoUsuarioNaoExiste() {
-            when(usuarioRepository.findById(7L)).thenReturn(Optional.empty());
+            when(usuarioRepositoryPort.buscarPorId(7L)).thenReturn(Optional.empty());
 
-            assertThrows(UsuarioInexistenteException.class,
-                    () -> service.create(request(sala(12L), null, LocalTime.of(9, 0), LocalTime.of(10, 0)), 7L));
+            assertThrows(
+                    UsuarioInexistenteException.class,
+                    () -> service.create(request(sala(12L), null, LocalTime.of(9, 0), LocalTime.of(10, 0)), 7L)
+            );
 
-            verifyNoInteractions(salaRepository, logRepository, agendamentoRepository);
+            verifyNoInteractions(salaRepositoryPort, agendamentoRepositoryPort, logRepositoryPort);
         }
 
         @Test
-        @DisplayName("Deve rejeitar o agendamento quando a sala não existe")
+        @DisplayName("Deve rejeitar agendamento quando a sala não existe")
         void deveRejeitarAgendamentoQuandoSalaNaoExiste() {
-            when(usuarioRepository.findById(7L)).thenReturn(Optional.of(usuario(7L, PerfilUsuario.USER)));
-            when(salaRepository.findById(12L)).thenReturn(Optional.empty());
+            when(usuarioRepositoryPort.buscarPorId(7L))
+                    .thenReturn(Optional.of(usuario(7L, PerfilUsuario.USER)));
+            when(salaRepositoryPort.buscarPorId(12L)).thenReturn(Optional.empty());
 
-            assertThrows(SalaInexistenteException.class,
-                    () -> service.create(request(sala(12L), null, LocalTime.of(9, 0), LocalTime.of(10, 0)), 7L));
-
-            verifyNoInteractions(logRepository, agendamentoRepository);
-        }
-
-        @Test
-        @DisplayName("Deve rejeitar o agendamento quando houver conflito de horário")
-        void deveRejeitarSalaComConflitoDeHorario() {
-            CriarAgendamentoRequest request = request(
-                    sala(12L), null, LocalTime.of(9, 0), LocalTime.of(10, 0)
+            assertThrows(
+                    SalaInexistenteException.class,
+                    () -> service.create(request(sala(12L), null, LocalTime.of(9, 0), LocalTime.of(10, 0)), 7L)
             );
-            prepararCriacao(usuario(7L, PerfilUsuario.USER), sala(12L), request);
-            when(logRepository.existeConflito(12L, request.data(), request.horaInicio(), request.horaFim()))
-                    .thenReturn(true);
 
-            assertThrows(SalaIndisponivelException.class, () -> service.create(request, 7L));
-
-            verify(agendamentoRepository, never()).save(any());
-            verify(logRepository, never()).save(any());
-        }
-
-        @Test
-        @DisplayName("Deve rejeitar o agendamento quando a sala estiver indisponível")
-        void deveRejeitarSalaIndisponivel() {
-            Sala sala = sala(12L, false, 8);
-            CriarAgendamentoRequest request = request(
-                    sala, null, LocalTime.of(9, 0), LocalTime.of(10, 0)
-            );
-            prepararCriacao(usuario(7L, PerfilUsuario.USER), sala, request);
-
-            assertThrows(SalaIndisponivelException.class, () -> service.create(request, 7L));
-
-            verify(agendamentoRepository, never()).save(any());
-            verify(logRepository, never()).save(any());
+            verifyNoInteractions(agendamentoRepositoryPort, logRepositoryPort);
         }
 
         @Test
@@ -204,10 +173,11 @@ class AgendamentoServiceTest {
         void deveRejeitarDuracaoSuperiorADuasHorasParaUsuarioComum() {
             Sala sala = sala(12L);
             CriarAgendamentoRequest request = request(
-                    sala, null, LocalTime.of(9, 0), LocalTime.of(11, 1)
+                    sala, null, LocalTime.of(9, 0), LocalTime.of(11, 1), 4
             );
-            when(usuarioRepository.findById(7L)).thenReturn(Optional.of(usuario(7L, PerfilUsuario.USER)));
-            when(salaRepository.findById(12L)).thenReturn(Optional.of(sala));
+            when(usuarioRepositoryPort.buscarPorId(7L))
+                    .thenReturn(Optional.of(usuario(7L, PerfilUsuario.USER)));
+            when(salaRepositoryPort.buscarPorId(sala.getId())).thenReturn(Optional.of(sala));
 
             ValidacaoBuscaException exception = assertThrows(
                     ValidacaoBuscaException.class,
@@ -215,8 +185,7 @@ class AgendamentoServiceTest {
             );
 
             assertThat(exception).hasMessage("A duração não pode ser maior que 2 horas.");
-            verify(agendamentoRepository, never()).save(any());
-            verify(logRepository, never()).save(any());
+            verifyNoInteractions(logRepositoryPort, agendamentoRepositoryPort);
         }
 
         @Test
@@ -226,66 +195,95 @@ class AgendamentoServiceTest {
             CriarAgendamentoRequest request = request(
                     sala, null, LocalTime.of(9, 0), LocalTime.of(10, 0), 9
             );
-            when(usuarioRepository.findById(7L)).thenReturn(Optional.of(usuario(7L, PerfilUsuario.USER)));
-            when(salaRepository.findById(12L)).thenReturn(Optional.of(sala));
+            when(usuarioRepositoryPort.buscarPorId(7L))
+                    .thenReturn(Optional.of(usuario(7L, PerfilUsuario.USER)));
+            when(salaRepositoryPort.buscarPorId(sala.getId())).thenReturn(Optional.of(sala));
 
             assertThrows(CapacidadeNaoSuportadaException.class, () -> service.create(request, 7L));
 
-            verify(agendamentoRepository, never()).save(any());
-            verify(logRepository, never()).save(any());
+            verifyNoInteractions(logRepositoryPort, agendamentoRepositoryPort);
         }
 
         @Test
-        @DisplayName("Deve rejeitar o agendamento quando o horário final anteceder o inicial")
-        void deveRejeitarHorarioFinalAnteriorAoInicial() {
+        @DisplayName("Deve rejeitar agendamento quando já existir conflito de horário")
+        void deveRejeitarConflitoDeHorario() {
+            Sala sala = sala(12L);
             CriarAgendamentoRequest request = request(
-                    sala(12L), null, LocalTime.of(10, 0), LocalTime.of(9, 0)
+                    sala, null, LocalTime.of(9, 0), LocalTime.of(10, 0), 4
             );
-            prepararCriacao(usuario(7L, PerfilUsuario.USER), sala(12L), request);
-            when(logRepository.existeConflito(12L, request.data(), request.horaInicio(), request.horaFim()))
-                    .thenReturn(false);
+            when(usuarioRepositoryPort.buscarPorId(7L))
+                    .thenReturn(Optional.of(usuario(7L, PerfilUsuario.USER)));
+            when(salaRepositoryPort.buscarPorId(sala.getId())).thenReturn(Optional.of(sala));
+            when(logRepositoryPort.existeConflito(
+                    sala.getId(), request.data(), request.horaInicio(), request.horaFim()
+            )).thenReturn(true);
+
+            assertThrows(SalaIndisponivelException.class, () -> service.create(request, 7L));
+
+            verify(agendamentoRepositoryPort, never()).salvar(any());
+            verify(logRepositoryPort, never()).salvar(any());
+        }
+
+        @Test
+        @DisplayName("Deve rejeitar agendamento quando a sala estiver marcada como indisponível")
+        void deveRejeitarSalaIndisponivel() {
+            Sala sala = sala(12L, false, 8);
+            CriarAgendamentoRequest request = request(
+                    sala, null, LocalTime.of(9, 0), LocalTime.of(10, 0), 4
+            );
+            prepararCriacao(usuario(7L, PerfilUsuario.USER), sala, request);
+
+            assertThrows(SalaIndisponivelException.class, () -> service.create(request, 7L));
+
+            verify(agendamentoRepositoryPort, never()).salvar(any());
+            verify(logRepositoryPort, never()).salvar(any());
+        }
+
+        @Test
+        @DisplayName("Deve rejeitar horário final anterior ao inicial")
+        void deveRejeitarHorarioFinalAnteriorAoInicial() {
+            Sala sala = sala(12L);
+            CriarAgendamentoRequest request = request(
+                    sala, null, LocalTime.of(10, 0), LocalTime.of(9, 0), 4
+            );
+            prepararCriacao(usuario(7L, PerfilUsuario.USER), sala, request);
 
             assertThrows(HorarioAgendamentoInvalidoException.class, () -> service.create(request, 7L));
 
-            verify(agendamentoRepository, never()).save(any());
-            verify(logRepository, never()).save(any());
+            verify(agendamentoRepositoryPort, never()).salvar(any());
+            verify(logRepositoryPort, never()).salvar(any());
         }
 
         @Test
         @DisplayName("Deve impedir usuário comum de agendar para outra pessoa")
         void deveImpedirUsuarioComumDeAgendarParaOutroUsuario() {
-            Usuario solicitante = usuario(8L, PerfilUsuario.USER);
             Sala sala = sala(12L);
             CriarAgendamentoRequest request = request(
-                    sala, solicitante, LocalTime.of(9, 0), LocalTime.of(10, 0)
+                    sala, usuario(8L, PerfilUsuario.USER), LocalTime.of(9, 0), LocalTime.of(10, 0), 4
             );
             prepararCriacao(usuario(7L, PerfilUsuario.USER), sala, request);
 
             assertThrows(UsuarioSemPermissaoException.class, () -> service.create(request, 7L));
 
-            verify(usuarioRepository, never()).findById(8L);
-            verify(agendamentoRepository, never()).save(any());
-            verify(logRepository, never()).save(any());
+            verify(usuarioRepositoryPort, never()).buscarPorId(8L);
+            verify(agendamentoRepositoryPort, never()).salvar(any());
+            verify(logRepositoryPort, never()).salvar(any());
         }
 
         @Test
-        @DisplayName("Deve rejeitar solicitante inexistente mesmo quando o agendamento é feito por administrador")
-        void deveRejeitarSolicitanteInexistenteMesmoQuandoAdmin() {
-            Usuario admin = usuario(7L, PerfilUsuario.ADMIN);
+        @DisplayName("Deve rejeitar solicitante inexistente mesmo quando o solicitante é definido por administrador")
+        void deveRejeitarSolicitanteInexistenteParaAdministrador() {
             Sala sala = sala(12L);
             CriarAgendamentoRequest request = request(
-                    sala,
-                    usuario(8L, PerfilUsuario.USER),
-                    LocalTime.of(9, 0),
-                    LocalTime.of(10, 0)
+                    sala, usuario(8L, PerfilUsuario.USER), LocalTime.of(9, 0), LocalTime.of(10, 0), 4
             );
-            prepararCriacao(admin, sala, request);
-            when(usuarioRepository.findById(8L)).thenReturn(Optional.empty());
+            prepararCriacao(usuario(7L, PerfilUsuario.ADMIN), sala, request);
+            when(usuarioRepositoryPort.buscarPorId(8L)).thenReturn(Optional.empty());
 
             assertThrows(UsuarioInexistenteException.class, () -> service.create(request, 7L));
 
-            verify(agendamentoRepository, never()).save(any());
-            verify(logRepository, never()).save(any());
+            verify(agendamentoRepositoryPort, never()).salvar(any());
+            verify(logRepositoryPort, never()).salvar(any());
         }
     }
 
@@ -299,79 +297,76 @@ class AgendamentoServiceTest {
             Usuario usuario = usuario(7L, PerfilUsuario.USER);
             Agendamento agendamento = agendamento(12L);
             AgendamentoResponse responseEsperada = agendamentoResponse();
-            when(usuarioRepository.findById(7L)).thenReturn(Optional.of(usuario));
-            when(agendamentoRepository.findByUsuarioId_Id(7L)).thenReturn(List.of(agendamento));
+            when(usuarioRepositoryPort.buscarPorId(usuario.getId())).thenReturn(Optional.of(usuario));
+            when(agendamentoRepositoryPort.buscarUsuarioId(usuario.getId())).thenReturn(List.of(agendamento));
             when(agendamentoMapper.entityToResponse(agendamento)).thenReturn(responseEsperada);
 
-            List<AgendamentoResponse> resultado = service.buscaAgendamentos(7L);
+            List<AgendamentoResponse> resultado = service.buscaAgendamentos(usuario.getId());
 
             assertThat(resultado).containsExactly(responseEsperada);
-            verify(agendamentoRepository).findByUsuarioId_Id(7L);
+            verify(agendamentoRepositoryPort).buscarUsuarioId(usuario.getId());
             verify(agendamentoMapper).entityToResponse(agendamento);
-            verifyNoMoreInteractions(agendamentoRepository, agendamentoMapper);
         }
 
         @Test
-        @DisplayName("Deve rejeitar a consulta pessoal quando o usuário autenticado não existe")
+        @DisplayName("Deve rejeitar consulta pessoal quando o usuário não existe")
         void deveRejeitarConsultaPessoalQuandoUsuarioNaoExiste() {
-            when(usuarioRepository.findById(7L)).thenReturn(Optional.empty());
+            when(usuarioRepositoryPort.buscarPorId(7L)).thenReturn(Optional.empty());
 
             assertThrows(UsuarioInexistenteException.class, () -> service.buscaAgendamentos(7L));
 
-            verifyNoInteractions(agendamentoRepository, agendamentoMapper);
+            verifyNoInteractions(agendamentoRepositoryPort, agendamentoMapper);
         }
 
         @Test
-        @DisplayName("Deve retornar todos os agendamentos quando a consulta for feita por administrador")
+        @DisplayName("Deve retornar todos os agendamentos para usuário administrador")
         void deveRetornarTodosAgendamentosParaAdministrador() {
             Usuario admin = usuario(7L, PerfilUsuario.ADMIN);
             Agendamento primeiro = agendamento(12L);
             Agendamento segundo = agendamento(13L);
             AgendamentoResponse primeiraResposta = agendamentoResponse();
             AgendamentoResponse segundaResposta = agendamentoResponse();
-            when(usuarioRepository.findById(7L)).thenReturn(Optional.of(admin));
-            when(agendamentoRepository.findAll()).thenReturn(List.of(primeiro, segundo));
+            when(usuarioRepositoryPort.buscarPorId(admin.getId())).thenReturn(Optional.of(admin));
+            when(agendamentoRepositoryPort.buscarTodos()).thenReturn(List.of(primeiro, segundo));
             when(agendamentoMapper.entityToResponse(primeiro)).thenReturn(primeiraResposta);
             when(agendamentoMapper.entityToResponse(segundo)).thenReturn(segundaResposta);
 
-            List<AgendamentoResponse> resultado = service.buscaTodosAgendamentos(7L);
+            List<AgendamentoResponse> resultado = service.buscaTodosAgendamentos(admin.getId());
 
             assertThat(resultado).containsExactly(primeiraResposta, segundaResposta);
-            verify(agendamentoRepository).findAll();
+            verify(agendamentoRepositoryPort).buscarTodos();
             verify(agendamentoMapper).entityToResponse(primeiro);
             verify(agendamentoMapper).entityToResponse(segundo);
         }
 
         @Test
-        @DisplayName("Deve rejeitar consulta geral quando o usuário não for administrador")
+        @DisplayName("Deve rejeitar consulta geral para usuário comum")
         void deveRejeitarConsultaGeralParaUsuarioComum() {
-            when(usuarioRepository.findById(7L)).thenReturn(Optional.of(usuario(7L, PerfilUsuario.USER)));
+            when(usuarioRepositoryPort.buscarPorId(7L))
+                    .thenReturn(Optional.of(usuario(7L, PerfilUsuario.USER)));
 
             assertThrows(UsuarioSemPermissaoException.class, () -> service.buscaTodosAgendamentos(7L));
 
-            verifyNoInteractions(agendamentoRepository, agendamentoMapper);
+            verifyNoInteractions(agendamentoRepositoryPort, agendamentoMapper);
         }
 
         @Test
-        @DisplayName("Deve rejeitar consulta geral quando o usuário autenticado não existe")
+        @DisplayName("Deve rejeitar consulta geral quando o usuário não existe")
         void deveRejeitarConsultaGeralQuandoUsuarioNaoExiste() {
-            when(usuarioRepository.findById(7L)).thenReturn(Optional.empty());
+            when(usuarioRepositoryPort.buscarPorId(7L)).thenReturn(Optional.empty());
 
             assertThrows(UsuarioInexistenteException.class, () -> service.buscaTodosAgendamentos(7L));
 
-            verifyNoInteractions(agendamentoRepository, agendamentoMapper);
+            verifyNoInteractions(agendamentoRepositoryPort, agendamentoMapper);
         }
     }
 
-    private void prepararCriacao(
-            Usuario usuario,
-            Sala sala,
-            CriarAgendamentoRequest request
-    ) {
-        when(usuarioRepository.findById(usuario.getId())).thenReturn(Optional.of(usuario));
-        when(salaRepository.findById(sala.getId())).thenReturn(Optional.of(sala));
-        when(logRepository.existeConflito(sala.getId(), request.data(), request.horaInicio(), request.horaFim()))
-                .thenReturn(false);
+    private void prepararCriacao(Usuario usuario, Sala sala, CriarAgendamentoRequest request) {
+        when(usuarioRepositoryPort.buscarPorId(usuario.getId())).thenReturn(Optional.of(usuario));
+        when(salaRepositoryPort.buscarPorId(sala.getId())).thenReturn(Optional.of(sala));
+        when(logRepositoryPort.existeConflito(
+                sala.getId(), request.data(), request.horaInicio(), request.horaFim()
+        )).thenReturn(false);
     }
 
     private Usuario usuario(Long id, PerfilUsuario perfil) {
@@ -388,7 +383,7 @@ class AgendamentoServiceTest {
     private Sala sala(Long id, boolean disponivel, int capacidade) {
         return Sala.builder()
                 .id(id)
-                .nome("Sala 1")
+                .nome("Sala Focus")
                 .disponivel(disponivel)
                 .capacidade(capacidade)
                 .build();
@@ -400,6 +395,7 @@ class AgendamentoServiceTest {
                 .usuarioId(usuario(7L, PerfilUsuario.USER))
                 .salaId(sala(12L))
                 .dataAgendamento(LocalDate.now().plusDays(1))
+                .dataCriacao(LocalDateTime.now())
                 .horaInicio(LocalTime.of(9, 0))
                 .horaFim(LocalTime.of(10, 0))
                 .qntdPessoas(4)
@@ -412,7 +408,7 @@ class AgendamentoServiceTest {
         return new AgendamentoResponse(
                 sala(12L),
                 LocalDate.now().plusDays(1),
-                LocalDate.now().atStartOfDay(),
+                LocalDateTime.now(),
                 LocalTime.of(9, 0),
                 LocalTime.of(10, 0),
                 4,
