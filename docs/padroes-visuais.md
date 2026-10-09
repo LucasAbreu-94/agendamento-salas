@@ -54,7 +54,11 @@ Padrão do portal (extraído do bundle oficial):
 - O favicon da aba é o mesmo `4SYS.ico` do portal (`/4SYS.ico`, ícone quadrado de 256x256 com o
   símbolo laranja), servido como `public/favicon.ico`. O logo horizontal nunca vira favicon: o
   navegador desenha o ícone em 16x16 quadrado e a imagem estica.
-- Item de menu com ícone, rótulo `Agendamento de Salas` e selo `Novo` em laranja, texto branco.
+- Item de menu: `0.75rem` (12px), peso 700, `padding: 0.875rem 1.125rem`, com ícone de calendário,
+  rótulo `Agendamento de Salas` e selo `Novo` em laranja, texto branco.
+- Hover do item colore o texto em `--orange-400`; o item ativo fica com texto `--orange` e
+  `border-bottom: 2px solid var(--orange)`, igual ao portal. Para o item ativo valer na tela inicial,
+  a rota `''` redireciona para `agendamento`.
 - À direita: nome do usuário + avatar circular de 2rem, fundo branco, borda 1px `--gray-200`,
   texto `--navy` com as iniciais. O nome some até `700px`.
 - Ícones da barra são brancos. Fundo transparente nos botões de ícone.
