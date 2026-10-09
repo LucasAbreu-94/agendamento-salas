@@ -1,0 +1,92 @@
+.topbar {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  min-height: 50px;
+  padding: 0 30px;
+  background: var(--navy);
+}
+
+.topbar__marca {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.625rem;
+  padding-right: 1.25rem;
+  border-right: 2px solid #ffffff;
+  color: #ffffff;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.topbar__simbolo {
+  flex: none;
+}
+
+.topbar__menu {
+  flex: 1;
+}
+
+.topbar__item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.375rem 0.625rem;
+  border-radius: 6px;
+  color: #ffffff;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.topbar__item:hover,
+.topbar__item--ativo {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.topbar__icone {
+  flex: none;
+}
+
+.topbar__selo {
+  padding: 0.125rem 0.5rem;
+  border-radius: 999px;
+  background: var(--orange);
+  color: #ffffff;
+  font-size: 0.6875rem;
+  font-weight: 700;
+}
+
+.topbar__usuario {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.625rem;
+  margin-left: auto;
+  color: #ffffff;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.topbar__avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border: 1px solid #bbbbbb;
+  border-radius: 50%;
+  background: #ffffff;
+  color: var(--navy);
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+@media (max-width: 720px) {
+  .topbar {
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+  }
+
+  .topbar__nome {
+    display: none;
+  }
+}

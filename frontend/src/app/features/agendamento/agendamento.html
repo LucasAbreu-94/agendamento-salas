@@ -1,4 +1,37 @@
-<section class="agendamento">
-  <h1>Agendamento de Salas</h1>
-  <p>Busca de salas disponíveis em construção.</p>
+<section class="pagina agendamento">
+  <header class="agendamento__cabecalho">
+    <p class="eyebrow">Tamboré</p>
+    <h1 class="titulo">Escolha uma sala</h1>
+    <p class="subtitulo">Selecione uma sala disponível na planta para continuar.</p>
+  </header>
+
+  @if (erroValidacao(); as falha) {
+    <p class="campo__erro agendamento__aviso" role="alert">{{ falha }}</p>
+  }
+
+  <div class="agendamento__corpo">
+    <app-mapa-salas
+      [salas]="salas()"
+      [data]="data()"
+      [horaInicio]="horaInicio()"
+      [carregando]="carregando()"
+      [erro]="erroApi()"
+      [selecionada]="selecionada()"
+      (selecionar)="selecionar($event)"
+      (tentarNovamente)="buscar()"
+    />
+
+    <app-painel-reserva
+      [sala]="salaEscolhida()"
+      [data]="data()"
+      [horaInicio]="horaInicio()"
+      [duracao]="duracao()"
+      [pessoas]="pessoas()"
+      [duracoes]="duracoes"
+      (dataAlterada)="atualizarData($event)"
+      (horaAlterada)="atualizarHora($event)"
+      (duracaoAlterada)="atualizarDuracao($event)"
+      (pessoasAlterada)="atualizarPessoas($event)"
+    />
+  </div>
 </section>

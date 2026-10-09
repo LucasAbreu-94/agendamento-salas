@@ -1,1 +1,245 @@
-/* You can add global styles to this file, and also import other style files */
+:root {
+  --navy: #222239;
+  --navy-soft: #13131f;
+  --orange: #ff5315;
+  --orange-400: #ff892e;
+  --orange-dark: #e04a10;
+  --orange-soft: #fde6da;
+  --text: #1e1e1e;
+  --muted: #6f6f6f;
+  --muted-soft: #9d9d9d;
+  --border: #d6d6d6;
+  --border-soft: #e7e9ec;
+  --surface: #eeeeee;
+  --disabled: #f2f2f2;
+  --green: #30d158;
+  --green-text: #09a743;
+  --page-bg: #f7f8fa;
+  --radius: 8px;
+  --font: 'Nunito', 'Segoe UI', system-ui, -apple-system, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font);
+  background: var(--page-bg);
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3,
+p {
+  margin: 0;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+:focus-visible {
+  outline: 2px solid var(--orange);
+  outline-offset: 2px;
+}
+
+.pagina {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem 4rem;
+}
+
+.eyebrow {
+  color: var(--orange);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.titulo {
+  margin-top: 0.5rem;
+  color: var(--navy);
+  font-size: 1.75rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.subtitulo {
+  margin-top: 0.5rem;
+  color: var(--muted);
+  font-size: 0.9375rem;
+}
+
+.botao {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 44px;
+  padding: 0 1.25rem;
+  border: 1px solid transparent;
+  border-radius: var(--radius);
+  background: var(--orange);
+  color: #ffffff;
+  font-family: inherit;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.botao:hover:not(:disabled) {
+  background: var(--orange-dark);
+}
+
+.botao:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.botao--contorno {
+  background: #ffffff;
+  border-color: var(--orange);
+  color: var(--orange);
+}
+
+.botao--contorno:hover:not(:disabled) {
+  background: var(--orange-soft);
+}
+
+.botao--suave {
+  background: #ffffff;
+  border-color: var(--border);
+  color: var(--text);
+}
+
+.botao--suave:hover:not(:disabled) {
+  background: var(--surface);
+}
+
+.campo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+
+.campo__rotulo {
+  color: var(--muted);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.campo__entrada {
+  min-height: 44px;
+  padding: 0 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: #ffffff;
+  color: var(--text);
+  font-family: inherit;
+  font-size: 0.9375rem;
+}
+
+.campo__entrada:focus {
+  border-color: var(--orange);
+}
+
+.campo__erro {
+  color: #dc2626;
+  font-size: 0.8125rem;
+}
+
+.cartao {
+  border: 1px solid var(--border-soft);
+  border-radius: 10px;
+  background: #ffffff;
+}
+
+.legenda__itens {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.25rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  color: var(--muted);
+  font-size: 0.75rem;
+}
+
+.legenda__itens li {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.legenda__nota {
+  color: var(--muted-soft);
+  font-size: 0.75rem;
+}
+
+.amostra {
+  width: 14px;
+  height: 14px;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  background: #ffffff;
+}
+
+.amostra--ocupada {
+  background: #eceef1;
+  border-color: #e2e5e9;
+}
+
+.amostra--selecionada {
+  background: #fffaf6;
+  border: 2px solid var(--orange-400);
+}
+
+.amostra--indisponivel {
+  background: repeating-linear-gradient(45deg, #f6f7f8 0 4px, #e9ecef 4px 8px);
+}
+
+.amostra--restrita {
+  background: var(--disabled);
+  border-style: dashed;
+}
+
+.dica {
+  position: relative;
+  display: inline-flex;
+}
+
+.dica__caixa {
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  z-index: 10;
+  width: max-content;
+  max-width: 200px;
+  padding: 0.375rem 0.5rem;
+  transform: translateX(-50%);
+  border-radius: 6px;
+  background: var(--navy);
+  color: #ffffff;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  line-height: 1.35;
+  text-align: left;
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.dica:hover .dica__caixa,
+.dica:focus-visible .dica__caixa {
+  visibility: visible;
+  opacity: 1;
+}
