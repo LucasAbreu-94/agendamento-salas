@@ -51,7 +51,9 @@ Padrão do portal (extraído do bundle oficial):
 - O símbolo é a imagem `public/logo-portal.png` (`<img>` decorativo, `alt=""`, com `height: 23px` e
   largura automática).
 - Abaixo de `900px` o texto `Portal` e a divisória somem, deixando só o símbolo (mesma regra do portal).
-- O favicon da aba é o mesmo arquivo (`<link rel="icon" type="image/png">`).
+- O favicon da aba é o mesmo `4SYS.ico` do portal (`/4SYS.ico`, ícone quadrado de 256x256 com o
+  símbolo laranja), servido como `public/favicon.ico`. O logo horizontal nunca vira favicon: o
+  navegador desenha o ícone em 16x16 quadrado e a imagem estica.
 - Item de menu com ícone, rótulo `Agendamento de Salas` e selo `Novo` em laranja, texto branco.
 - À direita: nome do usuário + avatar circular de 2rem, fundo branco, borda 1px `--gray-200`,
   texto `--navy` com as iniciais. O nome some até `700px`.
