@@ -16,15 +16,15 @@ public interface SalaJpaRepository extends JpaRepository<Sala, Long> {
     SELECT s
     FROM Sala s
     WHERE s.capacidade >= :pessoas
-      AND NOT EXISTS (
-          SELECT a
-          FROM Agendamento a
-          WHERE a.salaId = s
+    AND NOT EXISTS (
+        SELECT a
+        FROM Agendamento a
+        WHERE a.salaId = s
             AND FUNCTION('DATE', a.dataAgendamento) = :data
             AND a.horaInicio < :fim
             AND a.horaFim > :inicio
             AND a.status = br.com.foursys.agendamento_salas.enums.StatusAgendamento.CONFIRMADO
-      )
+    )
 """)
     List<Sala> buscarSalasDisponiveis(
             @Param("data") LocalDate data,
