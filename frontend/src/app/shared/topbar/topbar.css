@@ -90,3 +90,46 @@
     display: none;
   }
 }
+
+@media (max-width: 480px) {
+  .topbar {
+    gap: 0.5rem;
+    padding: 0.75rem;
+  }
+
+  .topbar__marca {
+    gap: 0.5rem;
+    padding-right: 0.75rem;
+    font-size: 1.125rem;
+  }
+
+  .topbar__item {
+    gap: 0.375rem;
+    padding: 0.375rem 0.5rem;
+    font-size: 0.8125rem;
+    white-space: nowrap;
+  }
+
+  .topbar__selo {
+    padding: 0.125rem 0.4375rem;
+    font-size: 0.625rem;
+  }
+}
+
+@media (max-width: 400px) {
+  .topbar {
+    padding: 0.75rem 0.5rem;
+  }
+
+  .topbar__icone {
+    display: none;
+  }
+
+  .topbar__marca {
+    font-size: 1rem;
+  }
+
+  .topbar__item {
+    font-size: 0.75rem;
+  }
+}
