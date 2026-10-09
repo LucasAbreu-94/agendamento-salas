@@ -63,8 +63,8 @@ Padrão do portal (extraído do bundle oficial):
 - Item de menu: `0.75rem` (12px), peso 700, `padding: 0.875rem 1.125rem`, com ícone de calendário,
   rótulo `Agendamento de Salas` e selo `Novo` em laranja, texto branco.
 - Hover do item colore o texto em `--orange-400`; o item ativo fica com texto `--orange` e
-  `border-bottom: 2px solid var(--orange)`, igual ao portal. Para o item ativo valer na tela inicial,
-  a rota `''` redireciona para `agendamento`.
+  `border-bottom: 2px solid var(--orange)`, igual ao portal. O item fica ativo só na rota
+  `agendamento`; a rota inicial (`''`) abre a home mockada do portal (`portal`).
 - À direita: nome do usuário + avatar circular de 2rem, fundo branco, borda 1px `--gray-200`,
   texto `--navy` com as iniciais. O nome some até `700px`.
 - Ícones da barra são brancos. Fundo transparente nos botões de ícone.
@@ -143,19 +143,22 @@ com a disposição espelhada do desenho de referência do escritório:
 - Colunas, da esquerda para a direita: corredor lateral, Sala 01, Sala 02, Sala 03, corredor central
   na vertical, Sala Comp 01 com Sala Comp 02, Sala Comp 03 com Sala Comp 04 e faixa de janelas.
 - Linhas, de cima para baixo: faixa de circulação, fileira de salas (o Auditório acompanha as duas
-  primeiras fileiras), Sala de servidores à esquerda com a Sala de suporte ao lado, fileira de baixo
+  primeiras fileiras), Sala de servidores à esquerda com o Time do suporte ao lado, fileira de baixo
   com a Sala Focus à esquerda e as Comp 03 e Comp 04 à direita, faixa de mesas.
-- A Sala de servidores e a Sala de suporte não são reserváveis: fundo `--page-bg`, borda tracejada e
+- A Sala de servidores e o Time do suporte não são reserváveis: fundo `--page-bg`, borda tracejada e
   rótulo em caixa alta. Não entram na legenda de estados.
 - O Auditório é uma sala restrita (`<div class="sala sala--restrita">`, não é `<button>`): fundo
   `--disabled`, borda tracejada, capacidade `A definir`, selo `Agendamento somente com um
-responsável` e dica acessível com `bianca.silva@foursys.com.br`. É o quinto estado da legenda,
+responsável` e dica acessível com `Reserve com a equipe de Facilities`. É o quinto estado da legenda,
   `Restrito`, e só passa a ser reservável quando existir usuário admin (issue de login).
 - A dica (`.dica` e `.dica__caixa`) é um padrão global de `styles.css`, aberta no hover e no
   `:focus-visible`, com `role="tooltip"` e `aria-describedby`.
 - Áreas estáticas (circulação, mesas e janelas) usam texto curto em caixa alta, `0.5625rem`, peso 700
   e cor `--muted-soft`; as verticais usam `writing-mode: vertical-rl`.
 - Cada sala é um `<button>` posicionado por `grid-area`, com os estados da seção 9.
+- A célula da sala mostra só o nome e a capacidade máxima no formato curto `Até N` (Focus 2, Salas 01
+  a 03 com 4, Comp 01 a 04 com 8). As regras de grupo ficam fora da planta, na nota
+  `legenda__regras` do rodapé do cartão.
 - Em telas estreitas a planta mantém `min-width: 640px` e o corpo do cartão ganha rolagem
   horizontal. A rolagem fica só na `.planta__rolagem`, para a lista de baixo não acompanhar o
   arraste.
@@ -164,3 +167,28 @@ responsável` e dica acessível com `bianca.silva@foursys.com.br`. É o quinto e
   breakpoint a lista fica com `display: none` e a planta continua sendo usada.
 - A lista reusa as amostras globais (`.amostra`) e os mesmos estados da planta, com seleção
   espelhada nos dois lugares.
+
+## 13. Painel de resumo
+
+- Seletor de pessoas em stepper `-` / `+`. Com sala selecionada o `+` trava na capacidade da sala
+  (classe `naCapacidade`) e a linha `resumo__limite` mostra `Esta sala comporta até N pessoas.`
+- Equipamentos: linha com checkbox (`linha--check`), rótulo `Equipamentos` e valor
+  `Câmera e recursos para reunião híbrida`, seguida da nota
+  `Solicite o equipamento previamente à equipe de Facilities.`
+- O estado de equipamentos é local, no signal `equipamentos` do `Agendamento`, e entra no contrato de
+  reserva quando a confirmação for implementada.
+
+## 14. Home do portal (mock)
+
+- Rota `portal`, inicial da aplicação (`''` → `portal`) e destino do catch-all. O acesso
+  `Agendamento de Salas` leva para `/agendamento`.
+- Hero: `Portal ` em `--orange`, `Foursys` em `--navy`, ambos `1.25rem` peso 700, frase
+  `Juntos vamos mais longe.`, faixa cinza `#f8f8f9` com raio de 42px atrás do bloco e ilustração
+  `public/apps/hero-home.svg` à direita.
+- Grade de apps: caixa de 8rem, ícone de 2.25rem, nome de 13px peso 600 em `--navy`, hover com
+  sombra suave e `transform: scale(1.05)`.
+- 14 acessos: os 13 do portal oficial mais `Agendamento de Salas`, colocado logo depois de
+  `Portal de Gestão Pessoal`. Ícones oficiais em `public/apps/`; o do agendamento é um calendário SVG
+  criado para o projeto.
+- Rodapé com `* Esses links só podem ser acessados pela VPN.` e a versão `V.6.5.4`.
+- Os links oficiais abrem em nova aba (`target="_blank"` e `rel="noopener noreferrer"`).

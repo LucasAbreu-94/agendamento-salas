@@ -31,22 +31,24 @@ O backend lê banco e autenticação de um arquivo `backend/.env`, que não é v
 
 ## Fluxo do MVP
 
-1. Usuário entra pelo Portal da empresa e abre **Agendamento de Salas**.
-2. A tela inicial já é o mapa: ele informa data, horário, duração e quantidade de pessoas no painel de resumo.
+1. Usuário abre a home mockada do Portal (`/portal`) e clica em **Agendamento de Salas**, o acesso logo depois de **Portal de Gestão Pessoal**.
+2. A tela do agendamento já é o mapa: ele informa data, horário, duração e quantidade de pessoas no painel de resumo.
 3. O sistema apresenta a planta com as salas mockadas e a situação de cada uma.
-4. O usuário escolhe uma sala livre e revisa o resumo da reserva.
+4. O usuário escolhe uma sala livre e revisa o resumo da reserva; o seletor de pessoas respeita a capacidade da sala.
 5. A confirmação fica disponível após o login. Nesta etapa, nenhuma reserva é criada no Outlook.
 
 ## Salas mockadas
 
-- Sala Focus — Tamboré
-- Sala Comp 01 — Tamboré
-- Sala Comp 02 — Tamboré
-- Sala Comp 03 — Tamboré
-- Sala Comp 04 — Tamboré
-- Sala 01 — Tamboré
-- Sala 02 — Tamboré
-- Sala 03 — Tamboré
+- Sala Focus (Tamboré): 1 a 2 pessoas
+- Sala Comp 01 (Tamboré): 8 pessoas
+- Sala Comp 02 (Tamboré): 8 pessoas
+- Sala Comp 03 (Tamboré): 8 pessoas
+- Sala Comp 04 (Tamboré): 8 pessoas
+- Sala 01 (Tamboré): 4 pessoas
+- Sala 02 (Tamboré): 4 pessoas
+- Sala 03 (Tamboré): 4 pessoas
+
+Regras de grupo: Focus para 1 a 2 pessoas, Salas 01 a 03 até 4, Comp a partir de 5. Reuniões com mais de 10 pessoas integram salas, conforme disponibilidade. Equipamentos de reunião híbrida são solicitados à equipe de Facilities.
 
 ## Identidade visual
 
