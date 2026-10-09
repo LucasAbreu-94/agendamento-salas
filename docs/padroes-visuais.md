@@ -23,6 +23,12 @@ Todo componente novo do frontend deve seguir esta lista. Se algo aqui entrar em 
 | `--gray-800`    | `#1e1e1e` | Texto principal                                   |
 | `--disabled`    | `#f2f2f2` | Fundo de elemento desabilitado                    |
 | `--page-bg`     | `#f7f8fa` | Fundo das telas                                   |
+| `--green`       | `#30d158` | Ponto de disponibilidade                          |
+| `--green-text`  | `#09a743` | Texto de confirmação                              |
+| `--green-soft`  | `#dcf6e4` | Fundo de sala disponível (planta e lista)         |
+| `--green-line`  | `#a9e6c0` | Borda de sala disponível                          |
+| `--red-soft`    | `#fde3e3` | Fundo de sala ocupada                             |
+| `--red-line`    | `#f7c3c3` | Borda de sala ocupada e indisponível              |
 
 Regras:
 
@@ -108,8 +114,9 @@ Nunca deixe a área em branco enquanto a chamada acontece.
 ## 9. Selos e etiquetas
 
 - Selo `Novo`: fundo `--orange`, texto branco, `0.6875rem`, peso 700, raio total.
-- Situação de sala: texto curto com ícone. Ocupada em cinza, indisponível com hachura diagonal,
-  selecionada com borda `--orange-400` e marca de confirmação.
+- Situação de sala: texto curto com ícone. Disponível com fundo `--green-soft` e borda `--green-line`,
+  ocupada com fundo `--red-soft`, indisponível com hachura diagonal em vermelho claro, selecionada com
+  borda `--orange-400` e marca de confirmação, restrito com fundo `--disabled` e borda tracejada.
 - A legenda de estados e as amostras de cor (`legenda__itens`, `legenda__nota` e `amostra`) ficam em
   `styles.css` como padrão global, junto com as demais classes compartilhadas.
 

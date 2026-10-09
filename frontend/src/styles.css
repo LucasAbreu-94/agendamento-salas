@@ -14,6 +14,10 @@
   --disabled: #f2f2f2;
   --green: #30d158;
   --green-text: #09a743;
+  --green-soft: #dcf6e4;
+  --green-line: #a9e6c0;
+  --red-soft: #fde3e3;
+  --red-line: #f7c3c3;
   --page-bg: #f7f8fa;
   --radius: 8px;
   --font: 'Nunito', 'Segoe UI', system-ui, -apple-system, sans-serif;
@@ -188,14 +192,14 @@ a {
 .amostra {
   width: 14px;
   height: 14px;
-  border: 1px solid var(--border);
+  border: 1px solid var(--green-line);
   border-radius: 3px;
-  background: #ffffff;
+  background: var(--green-soft);
 }
 
 .amostra--ocupada {
-  background: #eceef1;
-  border-color: #e2e5e9;
+  background: var(--red-soft);
+  border-color: var(--red-line);
 }
 
 .amostra--selecionada {
@@ -204,7 +208,8 @@ a {
 }
 
 .amostra--indisponivel {
-  background: repeating-linear-gradient(45deg, #f6f7f8 0 4px, #e9ecef 4px 8px);
+  background: repeating-linear-gradient(45deg, #fdecec 0 4px, #f8d6d6 4px 8px);
+  border-color: var(--red-line);
 }
 
 .amostra--restrita {
