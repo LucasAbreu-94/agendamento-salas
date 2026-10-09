@@ -1,5 +1,6 @@
 package br.com.foursys.agendamento_salas.controller;
 
+import br.com.foursys.agendamento_salas.domain.Sala;
 import br.com.foursys.agendamento_salas.dto.request.CriarAgendamentoRequest;
 import br.com.foursys.agendamento_salas.dto.request.CriarSalaRequest;
 import br.com.foursys.agendamento_salas.dto.response.SalaResponse;
@@ -37,7 +38,7 @@ public class SalaController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<SalaResponse> buscarPorId(
+    public ResponseEntity<Sala> buscarPorId(
             @PathVariable Long id
     ) {
         return ResponseEntity.ok(salaService.buscarPorId(id));

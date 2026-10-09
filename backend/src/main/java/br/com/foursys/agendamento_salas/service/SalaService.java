@@ -52,10 +52,9 @@ public class SalaService {
 
     }
 
-    public SalaResponse buscarPorId(Long id){
-       Sala sala = salaRepositoryPort.buscarPorId(id).orElseThrow(SalaInexistenteException::new);
 
-        return salaMapper.entityToResponse(sala);
+    public Sala buscarPorId(Long id){
+        return salaRepositoryPort.buscarPorId(id).orElseThrow(SalaInexistenteException::new);
     }
 
     public List<SalaResponse> listarSalas(){

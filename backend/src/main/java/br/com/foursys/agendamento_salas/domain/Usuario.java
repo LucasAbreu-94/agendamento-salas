@@ -2,13 +2,15 @@ package br.com.foursys.agendamento_salas.domain;
 
 import br.com.foursys.agendamento_salas.enums.PerfilUsuario;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
+@Builder
 @Entity
 @Table(name = "usuarios")
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class Usuario {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

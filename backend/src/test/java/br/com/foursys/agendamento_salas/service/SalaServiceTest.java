@@ -147,7 +147,7 @@ class SalaServiceTest {
         when(salaMapper.entityToResponse(sala))
                 .thenReturn(response);
 
-        SalaResponse resultado = salaService.buscarPorId(id);
+        Sala resultado = salaService.buscarPorId(id);
 
         assertSame(response, resultado);
 
