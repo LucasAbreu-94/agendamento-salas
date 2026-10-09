@@ -8,8 +8,8 @@
 
 .agendamento__corpo {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 320px;
-  gap: 2rem;
+  grid-template-columns: minmax(0, 1fr) 360px;
+  gap: 2.5rem;
   align-items: start;
   margin-top: 1.75rem;
 }
@@ -18,7 +18,7 @@
   min-width: 0;
 }
 
-@media (max-width: 960px) {
+@media (max-width: 900px) {
   .agendamento__corpo {
     grid-template-columns: minmax(0, 1fr);
   }

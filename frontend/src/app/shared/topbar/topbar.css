@@ -2,6 +2,7 @@
   display: flex;
   align-items: center;
   gap: 1.5rem;
+  height: 6vh;
   min-height: 50px;
   padding: 0 30px;
   background: var(--navy);
@@ -11,15 +12,20 @@
   display: inline-flex;
   align-items: center;
   gap: 0.625rem;
-  padding-right: 1.25rem;
-  border-right: 2px solid #ffffff;
   color: #ffffff;
   font-size: 1.25rem;
   font-weight: 600;
 }
 
+.topbar__texto {
+  padding-right: 1.25rem;
+  border-right: 2px solid #ffffff;
+}
+
 .topbar__simbolo {
   flex: none;
+  width: auto;
+  height: 23px;
 }
 
 .topbar__menu {
@@ -79,7 +85,13 @@
   font-weight: 600;
 }
 
-@media (max-width: 720px) {
+@media (max-width: 900px) {
+  .topbar__texto {
+    display: none;
+  }
+}
+
+@media (max-width: 700px) {
   .topbar {
     flex-wrap: wrap;
     gap: 0.75rem;
@@ -99,7 +111,6 @@
 
   .topbar__marca {
     gap: 0.5rem;
-    padding-right: 0.75rem;
     font-size: 1.125rem;
   }
 

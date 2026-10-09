@@ -1,4 +1,4 @@
-.lista {
+﻿.lista {
   display: none;
   gap: 0.5rem;
   margin: 1rem 0 0;
@@ -71,7 +71,7 @@
   white-space: nowrap;
 }
 
-@media (max-width: 720px) {
+@media (max-width: 700px) {
   .lista {
     display: grid;
   }

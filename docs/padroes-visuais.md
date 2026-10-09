@@ -43,23 +43,27 @@ Regras:
 
 ## 3. Barra superior
 
-Padrão do portal:
+Padrão do portal (extraído do bundle oficial):
 
-- Fundo `--navy`, `padding: 0 30px`, altura mínima de 50px.
-- À esquerda: símbolo laranja + texto `Portal` em branco, peso 600, com divisória branca de 2px
-  (`border-right`) separando do menu.
-- O símbolo é a imagem `public/logo-portal.png` (`<img>` decorativo, `alt=""`, 32x18).
+- Fundo `--navy`, `padding: 0 30px`, `height: 6vh` com `min-height: 50px` (a barra cresce em telas altas).
+- À esquerda: símbolo laranja + texto `Portal` em branco, `1.25rem`, peso 600, com divisória branca de 2px
+  (`border-right` e `padding-right: 1.25rem`) separando do menu.
+- O símbolo é a imagem `public/logo-portal.png` (`<img>` decorativo, `alt=""`, com `height: 23px` e
+  largura automática).
+- Abaixo de `900px` o texto `Portal` e a divisória somem, deixando só o símbolo (mesma regra do portal).
 - O favicon da aba é o mesmo arquivo (`<link rel="icon" type="image/png">`).
 - Item de menu com ícone, rótulo `Agendamento de Salas` e selo `Novo` em laranja, texto branco.
 - À direita: nome do usuário + avatar circular de 2rem, fundo branco, borda 1px `--gray-200`,
-  texto `--navy` com as iniciais.
+  texto `--navy` com as iniciais. O nome some até `700px`.
 - Ícones da barra são brancos. Fundo transparente nos botões de ícone.
 
 ## 4. Estrutura de página
 
-- Container centralizado, largura máxima de 1200px, `padding: 2rem 1.5rem 4rem`.
+- Container centralizado, largura máxima de 1500px, `padding: 2rem clamp(1.5rem, 4vw, 4rem) 4rem`.
+- Breakpoints do portal: `599px`, `700px`, `900px`, `1200px` e `1800px`. Este projeto usa `700px`
+  (topbar e lista de salas) e `900px` (colunas do agendamento).
 - Cabeçalho no topo: sobretítulo laranja em caixa alta (`TAMBORÉ`), título, subtítulo.
-- Áreas de conteúdo em grid simples, com gap de 2rem a 2.5rem.
+- Áreas de conteúdo em grid simples, com gap de 2.5rem; a coluna do resumo tem 360px.
 - Em telas estreitas, as colunas empilham em uma única coluna.
 
 ## 5. Superfícies e cartões
@@ -142,7 +146,7 @@ responsável` e dica acessível com `bianca.silva@foursys.com.br`. É o quinto e
 - Em telas estreitas a planta mantém `min-width: 640px` e o corpo do cartão ganha rolagem
   horizontal. A rolagem fica só na `.planta__rolagem`, para a lista de baixo não acompanhar o
   arraste.
-- Abaixo de `720px` a lista de salas (`app-lista-salas`) aparece sob a planta e vira o principal
+- Abaixo de `700px` a lista de salas (`app-lista-salas`) aparece sob a planta e vira o principal
   caminho de seleção: uma linha por sala com nome, capacidade, amostra e estado. Acima desse
   breakpoint a lista fica com `display: none` e a planta continua sendo usada.
 - A lista reusa as amostras globais (`.amostra`) e os mesmos estados da planta, com seleção

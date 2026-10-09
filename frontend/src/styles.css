@@ -49,9 +49,9 @@ a {
 }
 
 .pagina {
-  max-width: 1200px;
+  max-width: 1500px;
   margin: 0 auto;
-  padding: 2rem 1.5rem 4rem;
+  padding: 2rem clamp(1.5rem, 4vw, 4rem) 4rem;
 }
 
 .eyebrow {
