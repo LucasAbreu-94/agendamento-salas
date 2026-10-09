@@ -298,13 +298,13 @@ class AgendamentoServiceTest {
             Agendamento agendamento = agendamento(12L);
             AgendamentoResponse responseEsperada = agendamentoResponse();
             when(usuarioRepositoryPort.buscarPorId(usuario.getId())).thenReturn(Optional.of(usuario));
-            when(agendamentoRepositoryPort.buscarUsuarioId(usuario.getId())).thenReturn(List.of(agendamento));
+            when(agendamentoRepositoryPort.buscarAgendamentoPorUsuarioId(usuario.getId())).thenReturn(List.of(agendamento));
             when(agendamentoMapper.entityToResponse(agendamento)).thenReturn(responseEsperada);
 
             List<AgendamentoResponse> resultado = service.buscaAgendamentos(usuario.getId());
 
             assertThat(resultado).containsExactly(responseEsperada);
-            verify(agendamentoRepositoryPort).buscarUsuarioId(usuario.getId());
+            verify(agendamentoRepositoryPort).buscarAgendamentoPorUsuarioId(usuario.getId());
             verify(agendamentoMapper).entityToResponse(agendamento);
         }
 

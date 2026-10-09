@@ -84,7 +84,7 @@ class AgendamentoControllerTests {
         List<AgendamentoResponse> expected = List.of(agendamentoResponse());
         when(agendamentoService.buscaAgendamentos(42L)).thenReturn(expected);
 
-        var response = agendamentoController.buscaMeusAgendamentos();
+        var response = agendamentoController.buscaAgendamentos();
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(expected, response.getBody());
@@ -96,13 +96,13 @@ class AgendamentoControllerTests {
     void deveRetornarTodosAgendamentos() {
         when(securityUtils.get()).thenReturn(new AuthenticatedUser(7L, "admin@email.com"));
         List<AgendamentoResponse> expected = List.of(agendamentoResponse());
-        when(agendamentoService.buscaTodosAgendamentos(7L)).thenReturn(expected);
+        when(agendamentoService.buscaAgendamentos(7L)).thenReturn(expected);
 
         var response = agendamentoController.buscaAgendamentos();
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(expected, response.getBody());
-        verify(agendamentoService).buscaTodosAgendamentos(7L);
+        verify(agendamentoService).buscaAgendamentos(7L);
     }
 
     private AgendamentoResponse agendamentoResponse() {

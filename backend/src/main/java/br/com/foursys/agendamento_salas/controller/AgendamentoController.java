@@ -1,9 +1,10 @@
 package br.com.foursys.agendamento_salas.controller;
 
+import br.com.foursys.agendamento_salas.dto.request.BuscaAgendamentoFiltradaRequest;
+import br.com.foursys.agendamento_salas.dto.request.BuscaAgendamentoRequest;
 import br.com.foursys.agendamento_salas.dto.request.CriarAgendamentoRequest;
 import br.com.foursys.agendamento_salas.dto.response.AgendamentoResponse;
 import br.com.foursys.agendamento_salas.dto.response.ConfimacaoAgendamentoResponse;
-import br.com.foursys.agendamento_salas.security.AuthenticatedUser;
 import br.com.foursys.agendamento_salas.security.SecurityUtils;
 import br.com.foursys.agendamento_salas.service.AgendamentoService;
 import org.springframework.http.HttpStatus;
@@ -38,25 +39,44 @@ public class AgendamentoController {
                 .body(response);
     }
 
-    @GetMapping("/meus")
-    public ResponseEntity<List<AgendamentoResponse>> buscaMeusAgendamentos() {
+//    @GetMapping("/meus")
+//    public ResponseEntity<List<AgendamentoResponse>> buscaMeusAgendamentos() {
+//        Long usuarioAutenticado = securityUtils.get().id();
+//
+//        List<AgendamentoResponse> listaAgendamentos = agendamentoService.buscaAgendamentos(usuarioAutenticado);
+//
+//        return ResponseEntity
+//                .status(HttpStatus.OK)
+//                .body(listaAgendamentos);
+//    }
+
+    @GetMapping("/busca")
+    public ResponseEntity<List<AgendamentoResponse>> buscaAgendamentos(
+            @RequestBody BuscaAgendamentoRequest buscaAgendamentoRequest
+            ) {
         Long usuarioAutenticado = securityUtils.get().id();
 
-        List<AgendamentoResponse> listaAgendamentos = agendamentoService.buscaAgendamentos(usuarioAutenticado);
+        List<AgendamentoResponse> listaAgendamentos = agendamentoService
+                .buscaAgendamentos(usuarioAutenticado, buscaAgendamentoRequest.todosUsuarios());
 
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(listaAgendamentos);
     }
 
-    @GetMapping("/busca/todos")
-    public ResponseEntity<List<AgendamentoResponse>> buscaAgendamentos() {
+    @GetMapping("/busca/filtro")
+    public ResponseEntity<List<AgendamentoResponse>> buscaFiltrada(
+            @RequestBody BuscaAgendamentoFiltradaRequest buscaFiltradaRequest
+    ) {
         Long usuarioAutenticado = securityUtils.get().id();
 
-        List<AgendamentoResponse> listaAgendamentos = agendamentoService.buscaTodosAgendamentos(usuarioAutenticado);
+        List<AgendamentoResponse> listaAgendamentosFiltrado = agendamentoService.buscaFiltrada(
+                usuarioAutenticado, buscaFiltradaRequest.dataInicio(),
+                buscaFiltradaRequest.dataFinal(), buscaFiltradaRequest.statusAgendamento(),
+                buscaFiltradaRequest.todosUsuarios());
 
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(listaAgendamentos);
+                .body(listaAgendamentosFiltrado);
     }
 }
