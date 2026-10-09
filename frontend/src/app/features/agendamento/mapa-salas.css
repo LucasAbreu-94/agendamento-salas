@@ -58,6 +58,9 @@
 .planta__corpo {
   flex: 1;
   padding: 1.25rem;
+}
+
+.planta__rolagem {
   overflow-x: auto;
 }
 

@@ -14,8 +14,12 @@
   margin-top: 1.75rem;
 }
 
+.agendamento__corpo > * {
+  min-width: 0;
+}
+
 @media (max-width: 960px) {
   .agendamento__corpo {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 }

@@ -49,6 +49,7 @@ Padrão do portal:
 - À esquerda: símbolo laranja + texto `Portal` em branco, peso 600, com divisória branca de 2px
   (`border-right`) separando do menu.
 - O símbolo é a imagem `public/logo-portal.png` (`<img>` decorativo, `alt=""`, 32x18).
+- O favicon da aba é o mesmo arquivo (`<link rel="icon" type="image/png">`).
 - Item de menu com ícone, rótulo `Agendamento de Salas` e selo `Novo` em laranja, texto branco.
 - À direita: nome do usuário + avatar circular de 2rem, fundo branco, borda 1px `--gray-200`,
   texto `--navy` com as iniciais.
@@ -138,4 +139,11 @@ responsável` e dica acessível com `bianca.silva@foursys.com.br`. É o quinto e
 - Áreas estáticas (circulação, mesas e janelas) usam texto curto em caixa alta, `0.5625rem`, peso 700
   e cor `--muted-soft`; as verticais usam `writing-mode: vertical-rl`.
 - Cada sala é um `<button>` posicionado por `grid-area`, com os estados da seção 9.
-- Em telas estreitas a planta mantém `min-width: 640px` e o corpo do cartão ganha rolagem horizontal.
+- Em telas estreitas a planta mantém `min-width: 640px` e o corpo do cartão ganha rolagem
+  horizontal. A rolagem fica só na `.planta__rolagem`, para a lista de baixo não acompanhar o
+  arraste.
+- Abaixo de `720px` a lista de salas (`app-lista-salas`) aparece sob a planta e vira o principal
+  caminho de seleção: uma linha por sala com nome, capacidade, amostra e estado. Acima desse
+  breakpoint a lista fica com `display: none` e a planta continua sendo usada.
+- A lista reusa as amostras globais (`.amostra`) e os mesmos estados da planta, com seleção
+  espelhada nos dois lugares.

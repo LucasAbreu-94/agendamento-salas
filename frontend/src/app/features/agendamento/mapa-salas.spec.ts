@@ -30,6 +30,7 @@ describe('MapaSalas', () => {
 
     expect(compiled.querySelectorAll('button.sala').length).toBe(8);
     expect(compiled.querySelectorAll('.legenda__itens li').length).toBe(5);
+    expect(compiled.querySelector('app-lista-salas')).toBeTruthy();
     expect(compiled.textContent).toContain('Layout ilustrativo');
   });
 
@@ -87,7 +88,10 @@ describe('MapaSalas', () => {
 
   it('should show the empty state when every room is taken', () => {
     const fixture = montar([]);
-    expect((fixture.nativeElement as HTMLElement).querySelector('app-vazio')).toBeTruthy();
+    const compiled = fixture.nativeElement as HTMLElement;
+
+    expect(compiled.querySelector('app-vazio')).toBeTruthy();
+    expect(compiled.querySelector('app-lista-salas')).toBeNull();
   });
 
   it('should show the error state with retry', () => {

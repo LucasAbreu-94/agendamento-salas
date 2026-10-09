@@ -4,10 +4,11 @@ import { dataExtenso as formatarData, diaSemana as formatarDia } from '../../cor
 import { Carregando } from '../../shared/estados/carregando';
 import { Erro } from '../../shared/estados/erro';
 import { Vazio } from '../../shared/estados/vazio';
+import { ListaSalas } from './lista-salas';
 
 @Component({
   selector: 'app-mapa-salas',
-  imports: [Carregando, Erro, Vazio],
+  imports: [Carregando, Erro, ListaSalas, Vazio],
   templateUrl: './mapa-salas.html',
   styleUrl: './mapa-salas.css',
 })
