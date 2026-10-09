@@ -9,13 +9,13 @@ describe('PainelReserva', () => {
     }).compileComponents();
   });
 
-  function montar() {
+  function montar(pessoas = 4) {
     const fixture = TestBed.createComponent(PainelReserva);
     fixture.componentRef.setInput('sala', resolverEstados(['Sala 01'])[5]);
     fixture.componentRef.setInput('data', '2026-06-18');
     fixture.componentRef.setInput('horaInicio', '14:00');
     fixture.componentRef.setInput('duracao', 60);
-    fixture.componentRef.setInput('pessoas', 4);
+    fixture.componentRef.setInput('pessoas', pessoas);
     fixture.detectChanges();
     return fixture;
   }
@@ -56,7 +56,7 @@ describe('PainelReserva', () => {
   });
 
   it('should emit the new number of people', async () => {
-    const fixture = montar();
+    const fixture = montar(2);
     await fixture.whenStable();
 
     let quantidade = 0;
@@ -67,6 +67,34 @@ describe('PainelReserva', () => {
     );
     botoes[1].click();
 
-    expect(quantidade).toBe(5);
+    expect(quantidade).toBe(3);
+  });
+
+  it('should block the stepper at the room capacity', async () => {
+    const fixture = montar(4);
+    await fixture.whenStable();
+
+    const compiled = fixture.nativeElement as HTMLElement;
+    const botoes = compiled.querySelectorAll<HTMLButtonElement>('.stepper');
+
+    expect(botoes[1].disabled).toBe(true);
+    expect(compiled.textContent).toContain('Esta sala comporta até 4 pessoas.');
+  });
+
+  it('should emit the equipment request flag', async () => {
+    const fixture = montar();
+    await fixture.whenStable();
+
+    let marcado = false;
+    fixture.componentInstance.equipamentosAlterada.subscribe((valor) => (marcado = valor));
+
+    const compiled = fixture.nativeElement as HTMLElement;
+    const caixa = compiled.querySelector<HTMLInputElement>('#resumo-equipamentos');
+    expect(caixa).toBeTruthy();
+    expect(compiled.textContent).toContain('Solicite o equipamento previamente à equipe');
+
+    caixa?.click();
+
+    expect(marcado).toBe(true);
   });
 });

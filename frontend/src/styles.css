@@ -184,6 +184,12 @@ a {
   gap: 0.5rem;
 }
 
+.legenda__regras {
+  color: var(--muted);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
 .legenda__nota {
   color: var(--muted-soft);
   font-size: 0.75rem;

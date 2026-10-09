@@ -32,6 +32,8 @@ describe('MapaSalas', () => {
     expect(compiled.querySelectorAll('.legenda__itens li').length).toBe(5);
     expect(compiled.querySelector('app-lista-salas')).toBeTruthy();
     expect(compiled.textContent).toContain('Layout ilustrativo');
+    expect(compiled.textContent).toContain('Focus: 1 a 2 pessoas');
+    expect(compiled.textContent).toContain('Time do suporte');
   });
 
   it('should disable occupied and unavailable rooms', () => {
@@ -81,7 +83,7 @@ describe('MapaSalas', () => {
     expect(auditorio?.querySelector('.sala__capacidade')?.textContent).toContain('A definir');
     expect(auditorio?.textContent).toContain('somente com um responsável');
     expect(auditorio?.querySelector('[role="tooltip"]')?.textContent).toContain(
-      'bianca.silva@foursys.com.br',
+      'Reserve com a equipe de Facilities',
     );
     expect(auditorio?.tagName).toBe('DIV');
   });

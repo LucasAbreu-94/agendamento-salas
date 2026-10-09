@@ -150,6 +150,41 @@
   cursor: not-allowed;
 }
 
+.resumo__limite {
+  padding: 0.5rem 0 0.75rem;
+  color: var(--muted);
+  font-size: 0.75rem;
+}
+
+.linha--check {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  padding: 0.75rem 0;
+}
+
+.linha__check {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  cursor: pointer;
+}
+
+.linha__caixa {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  accent-color: var(--orange);
+  cursor: pointer;
+}
+
+.resumo__facilities {
+  padding-left: calc(18px + 0.75rem);
+  color: var(--muted);
+  font-size: 0.75rem;
+}
+
 .resumo__rodape {
   display: flex;
   flex-direction: column;

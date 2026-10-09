@@ -28,10 +28,12 @@
       [duracao]="duracao()"
       [pessoas]="pessoas()"
       [duracoes]="duracoes"
+      [equipamentos]="equipamentos()"
       (dataAlterada)="atualizarData($event)"
       (horaAlterada)="atualizarHora($event)"
       (duracaoAlterada)="atualizarDuracao($event)"
       (pessoasAlterada)="atualizarPessoas($event)"
+      (equipamentosAlterada)="equipamentos.set($event)"
     />
   </div>
 </section>

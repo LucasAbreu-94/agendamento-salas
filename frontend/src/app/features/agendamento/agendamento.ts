@@ -32,6 +32,7 @@ export class Agendamento implements OnInit {
   readonly horaInicio = signal(proximaHoraCheia());
   readonly duracao = signal(60);
   readonly pessoas = signal(1);
+  readonly equipamentos = signal(false);
 
   readonly salas = signal<SalaPlanta[]>([]);
   readonly selecionada = signal<string | null>(null);
@@ -53,7 +54,13 @@ export class Agendamento implements OnInit {
   }
 
   selecionar(nome: string): void {
+    const sala = this.salas().find((item) => item.nome === nome);
     this.selecionada.set(nome);
+
+    if (sala && this.pessoas() > sala.capacidade) {
+      this.pessoas.set(sala.capacidade);
+      this.buscar();
+    }
   }
 
   atualizarData(valor: string): void {

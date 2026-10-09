@@ -18,15 +18,24 @@ export class PainelReserva {
   readonly duracao = input<number>(60);
   readonly pessoas = input<number>(1);
   readonly duracoes = input<number[]>([30, 60, 90, 120]);
+  readonly equipamentos = input<boolean>(false);
 
   readonly dataAlterada = output<string>();
   readonly horaAlterada = output<string>();
   readonly duracaoAlterada = output<number>();
   readonly pessoasAlterada = output<number>();
+  readonly equipamentosAlterada = output<boolean>();
 
   readonly campoAberto = signal<CampoAberto>(null);
 
   readonly rotuloData = computed(() => dataCurta(this.data()));
+
+  readonly maximo = computed(() => this.sala()?.capacidade ?? null);
+
+  readonly naCapacidade = computed(() => {
+    const limite = this.maximo();
+    return limite !== null && this.pessoas() >= limite;
+  });
 
   readonly horaFim = computed(() => {
     const inicio = paraMinutos(this.horaInicio());
@@ -42,7 +51,17 @@ export class PainelReserva {
   }
 
   mudarPessoas(delta: number): void {
-    this.pessoasAlterada.emit(Math.max(1, this.pessoas() + delta));
+    const limite = this.maximo();
+    const alvo = this.pessoas() + delta;
+    const valor = Math.max(1, limite === null ? alvo : Math.min(alvo, limite));
+
+    if (valor !== this.pessoas()) {
+      this.pessoasAlterada.emit(valor);
+    }
+  }
+
+  caixaMarcada(evento: Event): boolean {
+    return (evento.target as HTMLInputElement).checked;
   }
 
   valorDoCampo(evento: Event): string {

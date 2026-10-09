@@ -58,7 +58,7 @@
             <span>Sala de servidores</span>
           </div>
           <div class="estrutural estrutural--suporte">
-            <span>Sala de suporte</span>
+            <span>Time do suporte</span>
           </div>
 
           <div class="sala sala--restrita">
@@ -67,7 +67,7 @@
             <span class="sala__restricao dica" tabindex="0" aria-describedby="dica-auditorio">
               Agendamento somente com um responsável
               <span class="dica__caixa" id="dica-auditorio" role="tooltip">
-                Quem pode agendar: bianca.silva@foursys.com.br
+                Reserve com a equipe de Facilities
               </span>
             </span>
           </div>
@@ -85,7 +85,7 @@
               (click)="selecionar.emit(sala.nome)"
             >
               <span class="sala__nome">{{ sala.nome }}</span>
-              <span class="sala__capacidade">{{ sala.capacidade }} pessoas</span>
+              <span class="sala__capacidade">Até {{ sala.capacidade }}</span>
 
               @if (selecionada() === sala.nome) {
                 <span class="sala__marca" aria-hidden="true">
@@ -122,6 +122,10 @@
       <li><span class="amostra amostra--indisponivel"></span>Indisponível</li>
       <li><span class="amostra amostra--restrita"></span>Restrito</li>
     </ul>
+    <p class="legenda__regras">
+      Focus: 1 a 2 pessoas | Salas 01 a 03: até 4 | Comp: a partir de 5 | Acima de 10: integre salas
+      conforme disponibilidade
+    </p>
     <p class="legenda__nota">Layout ilustrativo, sem escala real.</p>
   </footer>
 </section>

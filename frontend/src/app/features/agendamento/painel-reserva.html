@@ -224,12 +224,36 @@
         <button
           type="button"
           class="stepper"
-          aria-label="Adicionar uma pessoa"
+          [disabled]="naCapacidade()"
+          [attr.aria-label]="
+            naCapacidade() ? 'Quantidade máxima da sala selecionada' : 'Adicionar uma pessoa'
+          "
           (click)="mudarPessoas(1)"
         >
           +
         </button>
       </span>
+    </div>
+
+    @if (maximo(); as limite) {
+      <p class="resumo__limite">Esta sala comporta até {{ limite }} pessoas.</p>
+    }
+
+    <div class="linha linha--check">
+      <label class="linha__check" for="resumo-equipamentos">
+        <input
+          id="resumo-equipamentos"
+          class="linha__caixa"
+          type="checkbox"
+          [checked]="equipamentos()"
+          (change)="equipamentosAlterada.emit(caixaMarcada($event))"
+        />
+        <span class="linha__texto">
+          <span class="campo__rotulo">Equipamentos</span>
+          <strong>Câmera e recursos para reunião híbrida</strong>
+        </span>
+      </label>
+      <p class="resumo__facilities">Solicite o equipamento previamente à equipe de Facilities.</p>
     </div>
   </div>
 
