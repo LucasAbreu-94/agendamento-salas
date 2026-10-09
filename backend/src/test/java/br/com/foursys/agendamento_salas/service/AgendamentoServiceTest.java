@@ -298,13 +298,14 @@ class AgendamentoServiceTest {
             Agendamento agendamento = agendamento(12L);
             AgendamentoResponse responseEsperada = agendamentoResponse();
             when(usuarioRepositoryPort.buscarPorId(usuario.getId())).thenReturn(Optional.of(usuario));
-            when(agendamentoRepositoryPort.buscarUsuarioId(usuario.getId())).thenReturn(List.of(agendamento));
+            when(agendamentoRepositoryPort.buscarFiltrados(usuario.getId(), null, null, null))
+                    .thenReturn(List.of(agendamento));
             when(agendamentoMapper.entityToResponse(agendamento)).thenReturn(responseEsperada);
 
-            List<AgendamentoResponse> resultado = service.buscaAgendamentos(usuario.getId());
+            List<AgendamentoResponse> resultado = service.buscaAgendamentos(usuario.getId(), false);
 
             assertThat(resultado).containsExactly(responseEsperada);
-            verify(agendamentoRepositoryPort).buscarUsuarioId(usuario.getId());
+            verify(agendamentoRepositoryPort).buscarFiltrados(usuario.getId(), null, null, null);
             verify(agendamentoMapper).entityToResponse(agendamento);
         }
 
@@ -313,13 +314,13 @@ class AgendamentoServiceTest {
         void deveRejeitarConsultaPessoalQuandoUsuarioNaoExiste() {
             when(usuarioRepositoryPort.buscarPorId(7L)).thenReturn(Optional.empty());
 
-            assertThrows(UsuarioInexistenteException.class, () -> service.buscaAgendamentos(7L));
+            assertThrows(UsuarioInexistenteException.class, () -> service.buscaAgendamentos(7L, false));
 
             verifyNoInteractions(agendamentoRepositoryPort, agendamentoMapper);
         }
 
         @Test
-        @DisplayName("Deve retornar todos os agendamentos para usuário administrador")
+        @DisplayName("Deve retornar todos os agendamentos quando administrador solicita todos os usuários")
         void deveRetornarTodosAgendamentosParaAdministrador() {
             Usuario admin = usuario(7L, PerfilUsuario.ADMIN);
             Agendamento primeiro = agendamento(12L);
@@ -327,14 +328,15 @@ class AgendamentoServiceTest {
             AgendamentoResponse primeiraResposta = agendamentoResponse();
             AgendamentoResponse segundaResposta = agendamentoResponse();
             when(usuarioRepositoryPort.buscarPorId(admin.getId())).thenReturn(Optional.of(admin));
-            when(agendamentoRepositoryPort.buscarTodos()).thenReturn(List.of(primeiro, segundo));
+            when(agendamentoRepositoryPort.buscarFiltrados(null, null, null, null))
+                    .thenReturn(List.of(primeiro, segundo));
             when(agendamentoMapper.entityToResponse(primeiro)).thenReturn(primeiraResposta);
             when(agendamentoMapper.entityToResponse(segundo)).thenReturn(segundaResposta);
 
-            List<AgendamentoResponse> resultado = service.buscaTodosAgendamentos(admin.getId());
+            List<AgendamentoResponse> resultado = service.buscaAgendamentos(admin.getId(), true);
 
             assertThat(resultado).containsExactly(primeiraResposta, segundaResposta);
-            verify(agendamentoRepositoryPort).buscarTodos();
+            verify(agendamentoRepositoryPort).buscarFiltrados(null, null, null, null);
             verify(agendamentoMapper).entityToResponse(primeiro);
             verify(agendamentoMapper).entityToResponse(segundo);
         }
@@ -345,19 +347,65 @@ class AgendamentoServiceTest {
             when(usuarioRepositoryPort.buscarPorId(7L))
                     .thenReturn(Optional.of(usuario(7L, PerfilUsuario.USER)));
 
-            assertThrows(UsuarioSemPermissaoException.class, () -> service.buscaTodosAgendamentos(7L));
+            assertThrows(UsuarioSemPermissaoException.class, () -> service.buscaAgendamentos(7L, true));
 
             verifyNoInteractions(agendamentoRepositoryPort, agendamentoMapper);
         }
 
         @Test
-        @DisplayName("Deve rejeitar consulta geral quando o usuário não existe")
-        void deveRejeitarConsultaGeralQuandoUsuarioNaoExiste() {
-            when(usuarioRepositoryPort.buscarPorId(7L)).thenReturn(Optional.empty());
+        @DisplayName("Deve aplicar os filtros à consulta pessoal do usuário")
+        void deveAplicarFiltrosAConsultaDoUsuarioAutenticado() {
+            Usuario usuario = usuario(7L, PerfilUsuario.USER);
+            Agendamento agendamento = agendamento(12L);
+            AgendamentoResponse responseEsperada = agendamentoResponse();
+            LocalDate dataInicio = LocalDate.now();
+            LocalDate dataFim = dataInicio.plusDays(7);
+            StatusAgendamento status = StatusAgendamento.CONFIRMADO;
+            when(usuarioRepositoryPort.buscarPorId(usuario.getId())).thenReturn(Optional.of(usuario));
+            when(agendamentoRepositoryPort.buscarFiltrados(usuario.getId(), dataInicio, dataFim, status))
+                    .thenReturn(List.of(agendamento));
+            when(agendamentoMapper.entityToResponse(agendamento)).thenReturn(responseEsperada);
 
-            assertThrows(UsuarioInexistenteException.class, () -> service.buscaTodosAgendamentos(7L));
+            List<AgendamentoResponse> resultado = service.buscaFiltrada(
+                    usuario.getId(), dataInicio, dataFim, status, false
+            );
+
+            assertThat(resultado).containsExactly(responseEsperada);
+            verify(agendamentoRepositoryPort).buscarFiltrados(usuario.getId(), dataInicio, dataFim, status);
+            verify(agendamentoMapper).entityToResponse(agendamento);
+        }
+
+        @Test
+        @DisplayName("Deve rejeitar consulta filtrada de todos os usuários para usuário comum")
+        void deveRejeitarConsultaFiltradaDeTodosUsuariosParaUsuarioComum() {
+            when(usuarioRepositoryPort.buscarPorId(7L))
+                    .thenReturn(Optional.of(usuario(7L, PerfilUsuario.USER)));
+
+            assertThrows(
+                    UsuarioSemPermissaoException.class,
+                    () -> service.buscaFiltrada(7L, null, null, null, true)
+            );
 
             verifyNoInteractions(agendamentoRepositoryPort, agendamentoMapper);
+        }
+
+        @Test
+        @DisplayName("Deve aplicar filtros sem restringir o usuário quando administrador solicita todos")
+        void deveAplicarFiltrosParaTodosUsuariosQuandoAdmin() {
+            Usuario admin = usuario(7L, PerfilUsuario.ADMIN);
+            LocalDate dataInicio = LocalDate.now();
+            LocalDate dataFim = dataInicio.plusDays(7);
+            StatusAgendamento status = StatusAgendamento.CONFIRMADO;
+            when(usuarioRepositoryPort.buscarPorId(admin.getId())).thenReturn(Optional.of(admin));
+            when(agendamentoRepositoryPort.buscarFiltrados(null, dataInicio, dataFim, status))
+                    .thenReturn(List.of());
+
+            List<AgendamentoResponse> resultado = service.buscaFiltrada(
+                    admin.getId(), dataInicio, dataFim, status, true
+            );
+
+            assertThat(resultado).isEmpty();
+            verify(agendamentoRepositoryPort).buscarFiltrados(null, dataInicio, dataFim, status);
         }
     }
 

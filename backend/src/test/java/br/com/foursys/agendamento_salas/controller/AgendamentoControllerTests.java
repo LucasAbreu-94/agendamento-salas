@@ -1,6 +1,8 @@
 package br.com.foursys.agendamento_salas.controller;
 
 import br.com.foursys.agendamento_salas.domain.Sala;
+import br.com.foursys.agendamento_salas.dto.request.BuscaAgendamentoFiltradaRequest;
+import br.com.foursys.agendamento_salas.dto.request.BuscaAgendamentoRequest;
 import br.com.foursys.agendamento_salas.dto.request.CriarAgendamentoRequest;
 import br.com.foursys.agendamento_salas.dto.response.AgendamentoResponse;
 import br.com.foursys.agendamento_salas.dto.response.ConfimacaoAgendamentoResponse;
@@ -81,28 +83,53 @@ class AgendamentoControllerTests {
     @DisplayName("Deve retornar os agendamentos do usuário autenticado")
     void deveRetornarAgendamentosDoUsuarioAutenticado() {
         when(securityUtils.get()).thenReturn(new AuthenticatedUser(42L, "usuario@email.com"));
+        BuscaAgendamentoRequest request = new BuscaAgendamentoRequest(false);
         List<AgendamentoResponse> expected = List.of(agendamentoResponse());
-        when(agendamentoService.buscaAgendamentos(42L)).thenReturn(expected);
+        when(agendamentoService.buscaAgendamentos(42L, false)).thenReturn(expected);
 
-        var response = agendamentoController.buscaMeusAgendamentos();
+        var response = agendamentoController.buscaAgendamentos(request);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(expected, response.getBody());
-        verify(agendamentoService).buscaAgendamentos(42L);
+        verify(agendamentoService).buscaAgendamentos(42L, false);
     }
 
     @Test
     @DisplayName("Deve retornar todos os agendamentos pela consulta administrativa")
     void deveRetornarTodosAgendamentos() {
         when(securityUtils.get()).thenReturn(new AuthenticatedUser(7L, "admin@email.com"));
+        BuscaAgendamentoRequest request = new BuscaAgendamentoRequest(true);
         List<AgendamentoResponse> expected = List.of(agendamentoResponse());
-        when(agendamentoService.buscaTodosAgendamentos(7L)).thenReturn(expected);
+        when(agendamentoService.buscaAgendamentos(7L, true)).thenReturn(expected);
 
-        var response = agendamentoController.buscaAgendamentos();
+        var response = agendamentoController.buscaAgendamentos(request);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(expected, response.getBody());
-        verify(agendamentoService).buscaTodosAgendamentos(7L);
+        verify(agendamentoService).buscaAgendamentos(7L, true);
+    }
+
+    @Test
+    @DisplayName("Deve encaminhar os critérios da busca filtrada e usuário autenticado")
+    void deveBuscarAgendamentosComFiltros() {
+        when(securityUtils.get()).thenReturn(new AuthenticatedUser(42L, "usuario@email.com"));
+        LocalDate dataInicio = LocalDate.now();
+        LocalDate dataFinal = dataInicio.plusDays(7);
+        BuscaAgendamentoFiltradaRequest request = new BuscaAgendamentoFiltradaRequest(
+                dataInicio, dataFinal, StatusAgendamento.CONFIRMADO, false
+        );
+        List<AgendamentoResponse> expected = List.of(agendamentoResponse());
+        when(agendamentoService.buscaFiltrada(
+                42L, dataInicio, dataFinal, StatusAgendamento.CONFIRMADO, false
+        )).thenReturn(expected);
+
+        var response = agendamentoController.buscaFiltrada(request);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(expected, response.getBody());
+        verify(agendamentoService).buscaFiltrada(
+                42L, dataInicio, dataFinal, StatusAgendamento.CONFIRMADO, false
+        );
     }
 
     private AgendamentoResponse agendamentoResponse() {
