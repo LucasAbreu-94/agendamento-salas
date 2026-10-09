@@ -61,6 +61,19 @@ public class GlobalExceptionHandler {
 				));
 	}
 
+	@ExceptionHandler(ConversaNaoEncontradaException.class)
+	public ResponseEntity<ErrorResponse> handleSonversaNaoEncontrada(
+			ConversaNaoEncontradaException exception
+	) {
+		return ResponseEntity
+				.status(HttpStatus.NOT_FOUND)
+				.body(new ErrorResponse(
+						HttpStatus.NOT_FOUND.value(),
+						exception.getMessage(),
+						LocalDateTime.now()
+				));
+	}
+
 	@ExceptionHandler(SalaJaExisteException.class)
 	public ResponseEntity<ErrorResponse> handleSalaJaExiste(
 			SalaJaExisteException exception

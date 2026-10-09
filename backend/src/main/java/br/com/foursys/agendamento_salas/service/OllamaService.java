@@ -9,6 +9,7 @@ import org.springframework.web.client.RestClient;
 import tools.jackson.databind.ObjectMapper;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 
 @Service
 public class OllamaService {
@@ -32,100 +33,138 @@ public class OllamaService {
         return response.response();
     }
 
-    public InterpretarAgendamentoResponse interpretarAgendamento(String mensagem) {
+
+    public InterpretarAgendamentoResponse interpretarAgendamento(
+            String mensagem,
+            LocalDate dataConhecida,
+            LocalTime inicioConhecido,
+            LocalTime fimConhecido,
+            Integer quantidadePessoasConhecida
+    ) {
 
         LocalDate dataAtual = LocalDate.now();
 
+        String contexto = """
+            Data já conhecida: %s
+            Horário inicial já conhecido: %s
+            Horário final já conhecido: %s
+            Quantidade de pessoas já conhecida: %s
+            """.formatted(
+                valorOuNaoInformado(dataConhecida),
+                valorOuNaoInformado(inicioConhecido),
+                valorOuNaoInformado(fimConhecido),
+                valorOuNaoInformado(quantidadePessoasConhecida)
+        );
+
         String prompt = """
-                              Você é um assistente responsável por interpretar pedidos de agendamento de salas.
-                
-                                A data atual é %s.
-                
-                                Extraia da mensagem:
-                                - data
-                                - horário inicial
-                                - horário final
-                                - quantidade de pessoas
-                
-                                Para CADA campo, informe:
-                                - valor: o valor encontrado ou determinado a partir da mensagem
-                                - informado: true se o usuário informou esse dado
-                                - informado: false se o usuário NÃO informou esse dado
-                
-                                REGRA MUITO IMPORTANTE:
-                                Se o usuário NÃO informar um campo:
-                                - "informado" DEVE ser false
-                                - "valor" DEVE ser null
-                                - NUNCA invente um valor
-                                - NUNCA use 00:00 como substituto
-                
-                                REGRAS PARA INTERPRETAÇÃO DE DATAS:
-                
-                                - A data atual é %s.
-                                - Se o usuário disser "hoje", considere que ele INFORMOU a data.
-                                  Nesse caso:
-                                  - "informado" deve ser true
-                                  - "valor" deve ser exatamente a data atual: %s.
-                                - Se o usuário disser "amanhã", considere que ele INFORMOU a data.
-                                  Nesse caso:
-                                  - "informado" deve ser true
-                                  - "valor" deve ser a data do dia seguinte à data atual.
-                                - Se o usuário não mencionar nenhuma data, então:
-                                  - "informado" deve ser false
-                                  - "valor" deve ser null.
-                
-                                REGRAS PARA HORÁRIOS:
-                
-                                - "14h" deve ser convertido para "14:00:00".
-                                - "14h30" deve ser convertido para "14:30:00".
-                                - "14:00" deve ser mantido como "14:00:00".
-                                - Não invente horários.
-                
-                                REGRAS PARA QUANTIDADE:
-                
-                                - Quantidades escritas por extenso devem ser convertidas para números.
-                                - Não invente quantidade de pessoas.
-                
-                                Retorne SOMENTE JSON válido.
-                
-                                Use exatamente este formato:
-                
-                                {
-                                  "data": {
-                                    "valor": null,
-                                    "informado": false
-                                  },
-                                  "inicio": {
-                                    "valor": null,
-                                    "informado": false
-                                  },
-                                  "fim": {
-                                    "valor": null,
-                                    "informado": false
-                                  },
-                                  "quantidadePessoas": {
-                                    "valor": null,
-                                    "informado": false
-                                  }
-                                }
-                
-                                Mensagem do usuário:
-                                %s
-                                ""\".formatted(dataAtual, dataAtual, dataAtual, mensagem);
-                
-                Mensagem do usuário:
-                %s
-                """.formatted(dataAtual, dataAtual,dataAtual,dataAtual, mensagem);
+            Você é um assistente responsável por interpretar pedidos
+            de agendamento de salas.
+
+            A data atual é %s.
+
+            CONTEXTO DA CONVERSA:
+            Os valores abaixo já foram registrados pelo sistema.
+            Use-os para entender a nova mensagem, mas NÃO os considere
+            como informações fornecidas novamente pelo usuário.
+
+            %s
+
+            SUA TAREFA:
+            Interprete somente as informações novas ou corrigidas
+            que o usuário forneceu na mensagem atual.
+
+            Para cada campo, retorne:
+            - valor: o valor extraído da mensagem atual ou null.
+            - informado: true se a mensagem atual informou ou corrigiu
+              esse campo; false caso contrário.
+
+            REGRA OBRIGATÓRIA:
+            Se um campo não foi informado nem corrigido na mensagem atual:
+            - valor deve ser null.
+            - informado deve ser false.
+            - Não copie para o resultado o valor que já estava no contexto.
+            - Nunca invente informações.
+            - Nunca use 00:00 como substituto para horário ausente.
+
+            REGRAS PARA DATAS:
+            - Se a mensagem atual disser "hoje", informado deve ser true
+              e valor deve ser %s.
+            - Se disser "amanhã", informado deve ser true e valor deve
+              ser a data do dia seguinte a %s.
+            - Interprete datas relativas usando a data atual informada.
+            - Se não houver uma nova data na mensagem, retorne null
+              e informado false para data.
+
+            REGRAS PARA HORÁRIOS:
+            - "14h" deve ser convertido para "14:00:00".
+            - "14h30" deve ser convertido para "14:30:00".
+            - "14:00" deve ser convertido para "14:00:00".
+            - Não invente horários.
+            - Se a mensagem não informar ou corrigir um horário,
+              retorne null e informado false para esse campo.
+
+            REGRAS PARA QUANTIDADE:
+            - Converta quantidades escritas por extenso em números.
+            - Exemplo: "cinco pessoas" corresponde ao número 5.
+            - Não invente quantidades.
+            - Se a mensagem não informar ou corrigir a quantidade,
+              retorne null e informado false.
+
+            Retorne SOMENTE JSON válido, sem markdown ou explicações.
+            Use exatamente esta estrutura:
+
+            {
+              "data": {
+                "valor": null,
+                "informado": false
+              },
+              "inicio": {
+                "valor": null,
+                "informado": false
+              },
+              "fim": {
+                "valor": null,
+                "informado": false
+              },
+              "quantidadePessoas": {
+                "valor": null,
+                "informado": false
+              }
+            }
+
+            MENSAGEM ATUAL DO USUÁRIO:
+            %s
+            """.formatted(
+                dataAtual,
+                contexto,
+                dataAtual,
+                dataAtual,
+                mensagem
+        );
 
         try {
             String resposta = gerarResposta(prompt);
 
-            resposta = resposta.replace("```json", "").replace("```", "").trim();
+            resposta = resposta
+                    .replace("```json", "")
+                    .replace("```", "")
+                    .trim();
 
-            return objectMapper.readValue(resposta, InterpretarAgendamentoResponse.class);
+            return objectMapper.readValue(
+                    resposta,
+                    InterpretarAgendamentoResponse.class
+            );
 
         } catch (Exception e) {
-            throw new RuntimeException("Erro ao interpretar agendamento com Ollama", e);
+            throw new RuntimeException(
+                    "Erro ao interpretar agendamento com Ollama",
+                    e
+            );
         }
     }
+
+    private String valorOuNaoInformado(Object valor) {
+        return valor == null ? "não informado" : valor.toString();
+    }
+
 }

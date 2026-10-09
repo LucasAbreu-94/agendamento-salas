@@ -130,29 +130,22 @@ class SalaServiceTest {
 
     @Test
     void deveBuscarSalaPorId() {
-        Long id = 1L;
-
         Sala sala = Sala.builder()
-                .nome("Sala 01")
+                .id(1L)
+                .nome("Sala de Reunião")
                 .disponivel(true)
-                .capacidade(10)
-                .localizacao("Andar 1")
+                .capacidade(5)
+                .localizacao("2º andar")
                 .build();
 
-        SalaResponse response = mock(SalaResponse.class);
-
-        when(salaRepositoryPort.buscarPorId(id))
+        when(salaRepositoryPort.buscarPorId(1L))
                 .thenReturn(Optional.of(sala));
 
-        when(salaMapper.entityToResponse(sala))
-                .thenReturn(response);
+        Sala resultado = salaService.buscarPorId(1L);
 
-        SalaResponse resultado = salaService.buscarPorId(id);
+        assertSame(sala, resultado);
 
-        assertSame(response, resultado);
-
-        verify(salaRepositoryPort).buscarPorId(id);
-        verify(salaMapper).entityToResponse(sala);
+        verify(salaRepositoryPort).buscarPorId(1L);
     }
 
     @Test
