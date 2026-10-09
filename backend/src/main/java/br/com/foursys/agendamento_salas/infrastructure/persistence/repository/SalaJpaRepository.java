@@ -23,6 +23,7 @@ public interface SalaJpaRepository extends JpaRepository<Sala, Long> {
             AND FUNCTION('DATE', a.dataAgendamento) = :data
             AND a.horaInicio < :fim
             AND a.horaFim > :inicio
+            AND a.status = br.com.foursys.agendamento_salas.enums.StatusAgendamento.CONFIRMADO
       )
 """)
     List<Sala> buscarSalasDisponiveis(

@@ -51,6 +51,8 @@ public class AgendamentoService {
         Sala sala = salaRepositoryPort.buscarPorId(agendamentoRequest.salaId().getId())
                 .orElseThrow(SalaInexistenteException::new);
 
+        validarHorarioAgendamento(agendamentoRequest.horaInicio(), agendamentoRequest.horaFim());
+
         validarQuantidadeHorasAgendamento(agendamentoRequest.horaInicio(),
                 agendamentoRequest.horaFim(), usuario.getPerfilUsuario());
 
@@ -62,9 +64,6 @@ public class AgendamentoService {
         if(!sala.getDisponivel()) {
             throw new SalaIndisponivelException();
         }
-
-        //Hora inicial anterior à final.
-        validarHorarioAgendamento(agendamentoRequest.horaInicio(), agendamentoRequest.horaFim());
 
         Agendamento agendamento = Agendamento
                 .builder()
@@ -163,7 +162,7 @@ public class AgendamentoService {
     }
 
     private void validarConflitoHorario(Long idSala, LocalDate dataAgendamento, LocalTime horaInicio, LocalTime horaFim) {
-        boolean conflito = logRepositoryPort.existeConflito(idSala, dataAgendamento, horaInicio, horaFim);
+        boolean conflito = agendamentoRepositoryPort.existeConflito(idSala, dataAgendamento, horaInicio, horaFim);
 
         if(conflito) {
             throw new SalaIndisponivelException();

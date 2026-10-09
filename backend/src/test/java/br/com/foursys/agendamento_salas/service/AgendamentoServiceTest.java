@@ -214,7 +214,7 @@ class AgendamentoServiceTest {
             when(usuarioRepositoryPort.buscarPorId(7L))
                     .thenReturn(Optional.of(usuario(7L, PerfilUsuario.USER)));
             when(salaRepositoryPort.buscarPorId(sala.getId())).thenReturn(Optional.of(sala));
-            when(logRepositoryPort.existeConflito(
+            when(agendamentoRepositoryPort.existeConflito(
                     sala.getId(), request.data(), request.horaInicio(), request.horaFim()
             )).thenReturn(true);
 
@@ -246,7 +246,9 @@ class AgendamentoServiceTest {
             CriarAgendamentoRequest request = request(
                     sala, null, LocalTime.of(10, 0), LocalTime.of(9, 0), 4
             );
-            prepararCriacao(usuario(7L, PerfilUsuario.USER), sala, request);
+            when(usuarioRepositoryPort.buscarPorId(7L))
+                    .thenReturn(Optional.of(usuario(7L, PerfilUsuario.USER)));
+            when(salaRepositoryPort.buscarPorId(sala.getId())).thenReturn(Optional.of(sala));
 
             assertThrows(HorarioAgendamentoInvalidoException.class, () -> service.create(request, 7L));
 
@@ -364,7 +366,7 @@ class AgendamentoServiceTest {
     private void prepararCriacao(Usuario usuario, Sala sala, CriarAgendamentoRequest request) {
         when(usuarioRepositoryPort.buscarPorId(usuario.getId())).thenReturn(Optional.of(usuario));
         when(salaRepositoryPort.buscarPorId(sala.getId())).thenReturn(Optional.of(sala));
-        when(logRepositoryPort.existeConflito(
+        when(agendamentoRepositoryPort.existeConflito(
                 sala.getId(), request.data(), request.horaInicio(), request.horaFim()
         )).thenReturn(false);
     }

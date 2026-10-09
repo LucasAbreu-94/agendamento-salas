@@ -5,6 +5,8 @@ import br.com.foursys.agendamento_salas.infrastructure.persistence.repository.Ag
 import br.com.foursys.agendamento_salas.port.out.AgendamentoRepositoryPort;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 
 @Component
@@ -28,5 +30,10 @@ public class AgendamenRepositorytoAdapter implements AgendamentoRepositoryPort {
     @Override
     public List<Agendamento> buscarUsuarioId(Long id) {
         return agendamentoJpaRepository.findByUsuarioId_Id(id);
+    }
+
+    @Override
+    public boolean existeConflito(Long salaId, LocalDate dataAgendamento, LocalTime horaInicio, LocalTime horaFim) {
+        return agendamentoJpaRepository.existeConflito(salaId, dataAgendamento, horaInicio, horaFim);
     }
 }
