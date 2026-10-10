@@ -1,0 +1,149 @@
+.topbar {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  height: 6vh;
+  min-height: 50px;
+  padding: 0 30px;
+  background: var(--navy);
+}
+
+.topbar__marca {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.625rem;
+  color: #ffffff;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.topbar__texto {
+  padding-right: 1.25rem;
+  border-right: 2px solid #ffffff;
+}
+
+.topbar__simbolo {
+  flex: none;
+  width: auto;
+  height: 23px;
+}
+
+.topbar__menu {
+  flex: 1;
+}
+
+.topbar__item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.875rem 1.125rem;
+  color: #ffffff;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.topbar__item:hover {
+  color: var(--orange-400);
+}
+
+.topbar__item--ativo {
+  border-bottom: 2px solid var(--orange);
+  color: var(--orange);
+}
+
+.topbar__icone {
+  flex: none;
+}
+
+.topbar__selo {
+  padding: 0.125rem 0.5rem;
+  border-radius: 999px;
+  background: var(--orange);
+  color: #ffffff;
+  font-size: 0.6875rem;
+  font-weight: 700;
+}
+
+.topbar__usuario {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.625rem;
+  margin-left: auto;
+  color: #ffffff;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.topbar__avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border: 1px solid #bbbbbb;
+  border-radius: 50%;
+  background: #ffffff;
+  color: var(--navy);
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+@media (max-width: 900px) {
+  .topbar__texto {
+    display: none;
+  }
+}
+
+@media (max-width: 700px) {
+  .topbar {
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    padding: 0 1rem;
+  }
+
+  .topbar__nome {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .topbar {
+    gap: 0.5rem;
+    padding: 0.75rem;
+  }
+
+  .topbar__marca {
+    gap: 0.5rem;
+    font-size: 1.125rem;
+  }
+
+  .topbar__item {
+    gap: 0.375rem;
+    padding: 0.375rem 0.5rem;
+    font-size: 0.8125rem;
+    white-space: nowrap;
+  }
+
+  .topbar__selo {
+    padding: 0.125rem 0.4375rem;
+    font-size: 0.625rem;
+  }
+}
+
+@media (max-width: 400px) {
+  .topbar {
+    padding: 0.75rem 0.5rem;
+  }
+
+  .topbar__icone {
+    display: none;
+  }
+
+  .topbar__marca {
+    font-size: 1rem;
+  }
+
+  .topbar__item {
+    font-size: 0.75rem;
+  }
+}

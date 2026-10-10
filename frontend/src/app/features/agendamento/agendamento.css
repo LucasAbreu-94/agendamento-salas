@@ -1,5 +1,25 @@
-.agendamento {
-  max-width: 960px;
-  margin: 0 auto;
-  padding: 2rem 1rem;
+.agendamento__cabecalho {
+  max-width: 40rem;
+}
+
+.agendamento__aviso {
+  margin-top: 1rem;
+}
+
+.agendamento__corpo {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 360px;
+  gap: 2.5rem;
+  align-items: start;
+  margin-top: 1.75rem;
+}
+
+.agendamento__corpo > * {
+  min-width: 0;
+}
+
+@media (max-width: 900px) {
+  .agendamento__corpo {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }

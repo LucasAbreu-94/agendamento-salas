@@ -9,6 +9,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 
 @Component
@@ -40,5 +41,10 @@ public class AgendamenRepositorytoAdapter implements AgendamentoRepositoryPort {
                 );
 
         return agendamentoJpaRepository.findAll(specification);
+    }
+
+    @Override
+    public boolean existeConflito(Long salaId, LocalDate dataAgendamento, LocalTime horaInicio, LocalTime horaFim) {
+        return agendamentoJpaRepository.existeConflito(salaId, dataAgendamento, horaInicio, horaFim);
     }
 }

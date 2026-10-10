@@ -39,7 +39,7 @@ Resposta `200`:
 
 ```json
 [
-  { "id": "focus", "nome": "Sala Focus", "local": "Tamboré", "capacidade": 8 }
+  { "id": "focus", "nome": "Sala Focus", "local": "Tamboré", "capacidade": 2 }
 ]
 ```
 
