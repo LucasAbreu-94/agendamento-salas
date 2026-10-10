@@ -114,28 +114,44 @@ public class AgendamentoService {
                 .build();
     }
 
-    public List<AgendamentoResponse> buscaAgendamentos(Long usuarioAutenticado) {
-        buscarUsuario(usuarioAutenticado);
+    public List<AgendamentoResponse> buscaAgendamentos(Long usuarioAutenticado, boolean todosUsuarios) {
 
-        List<Agendamento> listaAgendamento = agendamentoRepositoryPort.buscarUsuarioId(usuarioAutenticado);
+        Usuario usuario = buscarUsuario(usuarioAutenticado);
 
-        return listaAgendamento
+        boolean isAdmin = usuario.getPerfilUsuario() == PerfilUsuario.ADMIN;
+
+        if (todosUsuarios && !isAdmin) {
+            throw new UsuarioSemPermissaoException();
+        }
+
+        Long usuarioId = todosUsuarios ? null : usuario.getId();
+
+        return agendamentoRepositoryPort.buscarFiltrados(
+                        usuarioId, null, null, null
+                )
                 .stream()
                 .map(agendamentoMapper::entityToResponse)
                 .toList();
     }
 
-    //Somente ADMIN
-    public List<AgendamentoResponse> buscaTodosAgendamentos(Long usuarioAutenticado) {
+    public List<AgendamentoResponse> buscaFiltrada(Long usuarioAutenticado, LocalDate dataInicio,
+            LocalDate dataFim, StatusAgendamento statusAgendamento, boolean todosUsuarios) {
+
         Usuario usuario = buscarUsuario(usuarioAutenticado);
 
-        if(usuario.getPerfilUsuario() != PerfilUsuario.ADMIN) {
+        boolean isAdmin = usuario.getPerfilUsuario() == PerfilUsuario.ADMIN;
+
+        if (todosUsuarios && !isAdmin) {
             throw new UsuarioSemPermissaoException();
         }
 
-        List<Agendamento> listaAgendamento = agendamentoRepositoryPort.buscarTodos();
+        Long usuarioId = todosUsuarios ? null : usuario.getId();
 
-        return listaAgendamento
+        return agendamentoRepositoryPort.buscarFiltrados(
+                        usuarioId,
+                        dataInicio,
+                        dataFim,
+                        statusAgendamento)
                 .stream()
                 .map(agendamentoMapper::entityToResponse)
                 .toList();

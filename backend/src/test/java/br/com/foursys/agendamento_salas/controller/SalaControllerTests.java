@@ -2,6 +2,7 @@ package br.com.foursys.agendamento_salas.controller;
 
 import br.com.foursys.agendamento_salas.config.CorsConfig;
 import br.com.foursys.agendamento_salas.config.SecurityConfig;
+import br.com.foursys.agendamento_salas.domain.Sala;
 import br.com.foursys.agendamento_salas.dto.request.CriarSalaRequest;
 import br.com.foursys.agendamento_salas.dto.response.SalaResponse;
 import br.com.foursys.agendamento_salas.exception.SalaInexistenteException;
@@ -20,9 +21,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.ArgumentMatchers.isNull;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
@@ -70,15 +69,22 @@ class SalaControllerTests {
 
 	@Test
 	void deveBuscarSalaExistentePorId() throws Exception {
+		Sala sala = Sala.builder()
+				.id(12L)
+				.nome("Sala Focus")
+				.disponivel(true)
+				.capacidade(8)
+				.localizacao("Tamboré")
+				.build();
+
 		when(salaService.buscarPorId(12L))
-				.thenReturn(new SalaResponse(12L, "Sala Focus", true, 8, "Tamboré"));
+				.thenReturn(sala);
 
 		mockMvc.perform(get("/api/salas/12"))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.id").value(12))
 				.andExpect(jsonPath("$.capacidade").value(8));
 	}
-
 	@Test
 	void deveRetornarTodasAsSalasParaUmaPessoa() throws Exception {
 

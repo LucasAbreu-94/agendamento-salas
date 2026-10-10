@@ -1,14 +1,10 @@
 package br.com.foursys.agendamento_salas.dto.response;
 
-import lombok.Builder;
-
-@Builder
-public record SalaResponse(
-        Long id,
+public record SugestaoSalaResponse(
+        Long salaId,
         String nome,
-        Boolean disponivel,
         Integer capacidade,
         String localizacao
-) {
 
+) {
 }
