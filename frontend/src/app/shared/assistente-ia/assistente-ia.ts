@@ -67,7 +67,7 @@ const TIMELINE = {
   bodySwayAngle: 2.2,
   blinkAt: 0.55,
   blinkDuration: 200,
-  bubbleDuration: 520,
+  bubbleDuration: 200,
   holdBeforeChat: 3200,
   morphDuration: 720,
   breatheDuration: 3400,
@@ -840,12 +840,7 @@ export class AssistenteIa implements AfterViewInit, OnDestroy {
         ],
         { duration: TIMELINE.bubbleDuration, easing: EASE.bubble, fill: 'backwards' },
       );
-      await ate(Promise.all([descendo.finished, surgindo.finished]));
-
-      await pausa(TIMELINE.holdBeforeChat);
-      this.iniciarRespiracao();
-      this.iniciarVida();
-      // Fecha o balão sozinho após 5s se o usuário não interagiu (timer independente da timeline)
+      // Fecha o balão 5s após surgir, se o usuário não interagiu (conta do surgimento, independente do resto da timeline)
       this.agendarDepois(() => {
         if (this.estado() === 'greeting') {
           this.bubbleEl.animate(
@@ -853,7 +848,12 @@ export class AssistenteIa implements AfterViewInit, OnDestroy {
             { duration: 380, easing: EASE.morph, fill: 'forwards' },
           );
         }
-      }, 5000);
+      }, 4000);
+      await ate(Promise.all([descendo.finished, surgindo.finished]));
+
+      await pausa(TIMELINE.holdBeforeChat);
+      this.iniciarRespiracao();
+      this.iniciarVida();
       // Permanece no estado 'greeting' aguardando o clique do usuário no mascote.
       // A transição para 'chat' é feita em tocarNoMascote().
     } catch (erro) {
@@ -877,13 +877,7 @@ export class AssistenteIa implements AfterViewInit, OnDestroy {
     });
 
     this.estado.set('greeting');
-    await ir(this.bubbleEl, [{ opacity: 0 }, { opacity: 1 }], {
-      duration: TIMELINE.fadeDuration,
-      easing: 'ease-out',
-    });
-
-    await pausa(TIMELINE.holdBeforeChat);
-    // Fecha o balão sozinho após 5s se o usuário não interagiu
+    // Fecha o balão 5s após surgir, se o usuário não interagiu (conta do surgimento)
     this.agendarDepois(() => {
       if (this.estado() === 'greeting') {
         this.bubbleEl.animate(
@@ -891,7 +885,13 @@ export class AssistenteIa implements AfterViewInit, OnDestroy {
           { duration: TIMELINE.fadeDuration / 2, fill: 'forwards' },
         );
       }
-    }, 5000);
+    }, 4000);
+    await ir(this.bubbleEl, [{ opacity: 0 }, { opacity: 1 }], {
+      duration: TIMELINE.fadeDuration,
+      easing: 'ease-out',
+    });
+
+    await pausa(TIMELINE.holdBeforeChat);
     // Permanece no estado 'greeting' aguardando o clique do usuário no mascote.
     // A transição para 'chat' é feita em tocarNoMascote().
   }
