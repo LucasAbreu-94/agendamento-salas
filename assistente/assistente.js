@@ -19,7 +19,7 @@
   };
 
   /* ══════════════════════════════════════════════════════════════════
-     2 · TIMELINE - todas as durações e atrasos (em ms) ficam aqui
+    2 · TIMELINE - todas as durações e atrasos (em ms) ficam aqui
      ══════════════════════════════════════════════════════════════════ */
   const TIMELINE = {
     // 1 · ENTRADA
@@ -29,8 +29,8 @@
     // 2 · ACENO
     waveDelay: 140,           // pausa entre o pop e o braço subir
     armRaiseDuration: 420,
-    waveCount: 3,             // quantos acenos (cada um = ida e volta)
-    waveSwingDuration: 480,   // duração de cada aceno
+    waveCount: 2,             // quantos acenos (cada um = ida e volta)
+    waveSwingDuration: 30,   // duração de cada aceno
     armLowerDuration: 450,
     armRaisedAngle: 90,       // ângulo central do braço levantado (graus)
     armSwingAngle: 20,        // amplitude do aceno (± graus)
